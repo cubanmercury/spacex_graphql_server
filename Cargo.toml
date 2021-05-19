@@ -1,0 +1,25 @@
+[package]
+name = "spacex_graphql_rust"
+version = "0.1.0"
+authors = ["Adam <a_martin15@hotmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-web = "3"
+dotenv = "0.15.0"
+log = "0.4.*"
+env_logger = "0.8"
+futures = { version = "0.3.*" }
+tokio = {version = "0.2.*", features = ["full"] }
+juniper = "0.15.3"
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
+actix-files = "0.3"
+actix-session = "0.4"
+actix-utils = "2"
+actix = "0.11.1"
+awc = {version = "2.0.3", features=["rustls"]}
+diesel = { version = "1.4.6", features = ["postgres"]}
