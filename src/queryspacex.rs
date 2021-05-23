@@ -5,6 +5,9 @@ use awc::Client;
 use awc::ClientResponse;
 use serde_derive::Deserialize;
 
+use crate::database::models::Roadster;
+use crate::database::models::Company;
+
 pub async fn get_client(
     endpoint: &str,
 ) -> Result<ClientResponse<Decompress<Payload>>, SendRequestError> {
@@ -158,45 +161,16 @@ pub async fn get_launches() {
     // println!("Response here: {:?}", response);
 }
 
-#[derive(Deserialize, Debug)]
-pub struct Roadster {
-    flickr_images: [String; 4],
-    name: String,
-    launch_date_utc: String,
-    launch_date_unix: u32,
-    launch_mass_kg: u32,
-    launch_mass_lbs: u32,
-    norad_id: u32,
-    epoch_jd: f64,
-    orbit_type: String,
-    apoapsis_au: f64,
-    periapsis_au: f64,
-    semi_major_axis_au: f64,
-    eccentricity: f64,
-    inclination: f64,
-    longitude: f64,
-    periapsis_arg: f64,
-    period_days: f64,
-    speed_kph: f64,
-    speed_mph: f64,
-    earth_distance_km: f64,
-    earth_distance_mi: f64,
-    mars_distance_km: f64,
-    mars_distance_mi: f64,
-    wikipedia: String,
-    video: String,
-    details: String,
-    id: String,
-}
 
+// Query SpaceX_API for roadster_info
 pub async fn get_roadster_info() -> Result<Roadster, actix_web::client::JsonPayloadError> {
-    let endpoint: &str = "https://api.spacexdata.com/v4/roadster";
+    let endpoint = String::from("https://api.spacexdata.com/v4/roadster");
     let response = get_client(&endpoint).await;
 
     let roadster_info: Result<_, _>;
 
     match response
-        .expect("Error getting JSON data for get_roadster")
+        .expect("Error getting JSON data for get_roadster_info")
         .json::<Roadster>()
         .await
     {
@@ -211,4 +185,29 @@ pub async fn get_roadster_info() -> Result<Roadster, actix_web::client::JsonPayl
     };
 
     return roadster_info;
+}
+
+// Query SpaceX_API for Company_info
+pub async fn get_company_info() -> Result<Company, actix_web::client::JsonPayloadError> {
+    let endpoint = String::from("https://api.spacexdata.com/v4/company");
+    let response = get_client(&endpoint).await;
+
+    let company_info: Result<_, _>;
+
+    match response
+        .expect("Error getting JSON data for get_company_info")
+        .json::<Company>()
+        .await
+    {
+        Ok(v) => {
+            println!("company JSON data: {:?}", v);
+            company_info = Ok(v);
+        }
+        Err(e) => {
+            println!("Error getting Company JSON data: {:?}", e);
+            company_info = Err(e);
+        }
+    }
+
+    return company_info;
 }

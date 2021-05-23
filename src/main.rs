@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate diesel;
+extern  crate dotenv;
 
 use actix_files as fs;
 use actix_session::{CookieSession, Session};
@@ -13,6 +14,7 @@ use std::{env, io};
 
 pub mod queryspacex;
 pub mod database;
+pub mod operations;
 
 
 /// simple index handler
@@ -71,13 +73,40 @@ async fn main() -> io::Result<()> {
 
     // queryspacex::get_launches().await;
     let roadster = queryspacex::get_roadster_info().await;
+    
 
     println!("ahhhh");
     match roadster {
-        Ok(info) => println!("roadster within main.rs, {:?}", info),
+        Ok(info) => {
+            println!("roadster within main.rs, {:?}", info);
+            handle_push_roadster_to_db(info);
+        },
         Err(e) => println!("roadster error within main.rs, {:?}", e)
     };
 
+    fn handle_push_roadster_to_db(info: database::models::Roadster) {
+        let conn = operations::establish_connection();
+        operations::delete_roadster_by_id(&conn, &info);
+        println!("delete previous rows for roadster");
+        let push_to_db = operations::create_roadster(&conn, &info);
+        println!("push_to_db: {:?}", push_to_db);
+    };
+
+    let company = queryspacex::get_company_info().await;
+    println!("ahhhhhhhhh2");
+    match company {
+        Ok(info) => {
+            println!("company data within main.rs: {:?}", info);
+            handle_push_company_to_db(info)
+        },
+        Err(e) => println!("Error getting Company JSON data: {:?}", e)
+    };
+
+    fn handle_push_company_to_db(info: database::models::Company) {
+        let conn = operations::establish_connection();
+        operations::delete_company_by_id(&conn, &info);
+        operations::create_company(&conn, &info);
+    };
 
     HttpServer::new(|| {
         App::new()

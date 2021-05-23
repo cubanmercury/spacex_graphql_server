@@ -1,4 +1,30 @@
 table! {
+    company_info (id) {
+        id -> Varchar,
+        name -> Nullable<Varchar>,
+        founder -> Nullable<Varchar>,
+        founded -> Nullable<Int4>,
+        employees -> Nullable<Int4>,
+        vehicles -> Nullable<Int4>,
+        launch_sites -> Nullable<Int4>,
+        test_sites -> Nullable<Int4>,
+        ceo -> Nullable<Varchar>,
+        cto -> Nullable<Varchar>,
+        coo -> Nullable<Varchar>,
+        cto_propulsion -> Nullable<Varchar>,
+        valuation -> Nullable<Int8>,
+        summary -> Nullable<Text>,
+        headquarters_address -> Nullable<Varchar>,
+        headquarters_city -> Nullable<Varchar>,
+        headquarters_state -> Nullable<Varchar>,
+        links_website -> Nullable<Varchar>,
+        links_flickr -> Nullable<Varchar>,
+        links_twitter -> Nullable<Varchar>,
+        links_elon_twitter -> Nullable<Varchar>,
+    }
+}
+
+table! {
     roadster_info (id) {
         apoapsis_au -> Nullable<Float8>,
         details -> Nullable<Text>,
@@ -29,3 +55,9 @@ table! {
         flickr_images -> Nullable<Array<Text>>,
     }
 }
+
+allow_tables_to_appear_in_same_query!(
+    company_info,
+    roadster_info,
+);
+ 

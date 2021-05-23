@@ -1,0 +1,25 @@
+CREATE TABLE company_info
+(
+  id character varying NOT NULL,
+  name character varying,
+  founder character varying,
+  founded integer,
+  employees integer,
+  vehicles integer,
+  launch_sites integer,
+  test_sites integer,
+  ceo character varying,
+  cto character varying,
+  coo character varying,
+  cto_propulsion character varying,
+  valuation bigint,
+  summary text,
+  headquarters_address character varying,
+  headquarters_city character varying,
+  headquarters_state character varying,
+  links_website character varying,
+  links_flickr character varying,
+  links_twitter character varying,
+  links_elon_twitter character varying,
+  CONSTRAINT company_info_pkey PRIMARY KEY (id)
+)
