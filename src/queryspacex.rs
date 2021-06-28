@@ -5,8 +5,9 @@ use awc::Client;
 use awc::ClientResponse;
 use serde_derive::Deserialize;
 
-use crate::database::models::Roadster;
 use crate::database::models::Company;
+use crate::database::models::Roadster;
+use crate::database::models::*;
 
 pub async fn get_client(
     endpoint: &str,
@@ -161,7 +162,6 @@ pub async fn get_launches() {
     // println!("Response here: {:?}", response);
 }
 
-
 // Query SpaceX_API for roadster_info
 pub async fn get_roadster_info() -> Result<Roadster, actix_web::client::JsonPayloadError> {
     let endpoint = String::from("https://api.spacexdata.com/v4/roadster");
@@ -207,7 +207,31 @@ pub async fn get_company_info() -> Result<Company, actix_web::client::JsonPayloa
             println!("Error getting Company JSON data: {:?}", e);
             company_info = Err(e);
         }
-    }
+    };
 
     return company_info;
+}
+
+pub async fn get_capsules() -> Result<Vec<Capsules>, actix_web::client::JsonPayloadError> {
+    let endpoint = String::from("https://api.spacexdata.com/v4/capsules");
+    let response = get_client(&endpoint).await;
+
+    let capsules: Result<_,_>;
+
+    match response
+        .expect("Error getting JSON data for get_capsules")
+        .json::<Vec<Capsules>>()
+        .await
+    {
+        Ok(v) => {
+            println!("Capsule JSON data: {:?}", v);
+            capsules = Ok(v)
+        }
+        Err(e) => {
+            println!("Error getting Capsule JSON data: {:?}", e);
+            capsules = Err(e);
+        }
+    };
+
+    return capsules;
 }

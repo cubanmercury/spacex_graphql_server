@@ -1,21 +1,19 @@
 #[macro_use]
 extern crate diesel;
-extern  crate dotenv;
+extern crate dotenv;
 
 use actix_files as fs;
 use actix_session::{CookieSession, Session};
 use actix_utils::mpsc;
 use actix_web::http::{header, Method, StatusCode};
 use actix_web::{
-    error, get, guard, middleware, web, App, Error, HttpRequest, HttpResponse,
-    HttpServer, Result,
+    error, get, guard, middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer, Result,
 };
 use std::{env, io};
 
-pub mod queryspacex;
 pub mod database;
 pub mod operations;
-
+pub mod queryspacex;
 
 /// simple index handler
 #[get("/welcome")]
@@ -54,17 +52,13 @@ async fn response_body(path: web::Path<String>) -> HttpResponse {
 }
 
 /// handler with path parameters like `/user/{name}/`
-async fn with_param(
-    req: HttpRequest,
-    web::Path((name,)): web::Path<(String,)>,
-) -> HttpResponse {
+async fn with_param(req: HttpRequest, web::Path((name,)): web::Path<(String,)>) -> HttpResponse {
     println!("{:?}", req);
 
     HttpResponse::Ok()
         .content_type("text/plain")
         .body(format!("Hello {}!", name))
 }
-
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
@@ -73,33 +67,32 @@ async fn main() -> io::Result<()> {
 
     // queryspacex::get_launches().await;
     let roadster = queryspacex::get_roadster_info().await;
-    
 
-    println!("ahhhh");
+    // println!("ahhhh");
     match roadster {
         Ok(info) => {
-            println!("roadster within main.rs, {:?}", info);
+            // println!("roadster within main.rs, {:?}", info);
             handle_push_roadster_to_db(info);
-        },
-        Err(e) => println!("roadster error within main.rs, {:?}", e)
+        }
+        Err(e) => println!("roadster error within main.rs, {:?}", e),
     };
 
     fn handle_push_roadster_to_db(info: database::models::Roadster) {
         let conn = operations::establish_connection();
         operations::delete_roadster_by_id(&conn, &info);
-        println!("delete previous rows for roadster");
+        // println!("delete previous rows for roadster");
         let push_to_db = operations::create_roadster(&conn, &info);
-        println!("push_to_db: {:?}", push_to_db);
+        // println!("push_to_db: {:?}", push_to_db);
     };
 
     let company = queryspacex::get_company_info().await;
-    println!("ahhhhhhhhh2");
+    // println!("ahhhhhhhhh2");
     match company {
         Ok(info) => {
-            println!("company data within main.rs: {:?}", info);
+            // println!("company data within main.rs: {:?}", info);
             handle_push_company_to_db(info)
-        },
-        Err(e) => println!("Error getting Company JSON data: {:?}", e)
+        }
+        Err(e) => println!("Error getting Company JSON data: {:?}", e),
     };
 
     fn handle_push_company_to_db(info: database::models::Company) {
@@ -107,6 +100,27 @@ async fn main() -> io::Result<()> {
         operations::delete_company_by_id(&conn, &info);
         operations::create_company(&conn, &info);
     };
+
+    let capsules = queryspacex::get_capsules().await;
+    // println!("ahhhhhhhhhhhhh3");
+    match capsules {
+        Ok(info) => {
+            println!("Capsule data: {:?}", info);
+            println!("ahhhhhhhhhhhhhh4");
+            for cap in info {
+                println!("capsule: {:?}", cap);
+                handle_push_capsules_to_db(cap);
+            }
+        }
+        Err(e) => {
+            println!("ERROR GETTING CAPSULES: {:?}", e)
+        }
+    };
+
+    fn handle_push_capsules_to_db(info: database::models::Capsules) {
+        let conn = operations::establish_connection();
+        operations::add_capsule(&conn, &info);
+    }
 
     HttpServer::new(|| {
         App::new()
@@ -119,9 +133,7 @@ async fn main() -> io::Result<()> {
             // with path parameters
             .service(web::resource("/user/{name}").route(web::get().to(with_param)))
             // async response body
-            .service(
-                web::resource("/async-body/{name}").route(web::get().to(response_body)),
-            )
+            .service(web::resource("/async-body/{name}").route(web::get().to(response_body)))
             .service(
                 web::resource("/test").to(|req: HttpRequest| match *req.method() {
                     Method::GET => HttpResponse::Ok(),

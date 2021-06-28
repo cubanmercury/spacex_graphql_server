@@ -7,8 +7,6 @@ use std::env;
 use crate::database::models::*;
 use crate::database::schema::*;
 
-use {Roadster, UpdateRoadster};
-
 
 pub fn establish_connection() -> PgConnection {
   dotenv().ok();
@@ -125,4 +123,32 @@ pub fn delete_company_by_id<'a>(
     .expect("Unable to delete Company entry");
   
   println!("Deleted {} Company entry", company_to_delete);
+}
+
+// Method to push a row into database table['capsules']
+pub fn add_capsule<'a>(
+  conn: &PgConnection,
+  capsule_details: &'a Capsules
+) {
+  let new_capsule = UpdateCapsules {
+    id: &capsule_details.id,
+    reuse_count: &capsule_details.reuse_count.unwrap(),
+    water_landings: &capsule_details.water_landings.unwrap(),
+    land_landings: &capsule_details.land_landings.unwrap(),
+    last_update: &capsule_details.last_update.clone().unwrap_or(String::from("No update found")),
+    launches: &capsule_details.launches.as_ref().unwrap(),
+    serial: &capsule_details.serial.as_ref().unwrap(),
+    status: &capsule_details.status.as_ref().unwrap(),
+    type_: &capsule_details.r#type.as_ref().unwrap(),
+  };
+
+  // Push row into capsules table, if a conflict is found the row is skipped.
+  diesel::insert_into(capsules::table)
+    .values(&new_capsule)
+    .on_conflict(capsules::id)
+    .do_update()
+    // .on_conflict_do_nothing()
+    .set(&new_capsule)
+    .execute(conn)
+    .expect("Error saving entry to capsules table");
 }

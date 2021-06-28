@@ -1,4 +1,19 @@
 table! {
+    capsules (id) {
+        id -> Varchar,
+        reuse_count -> Nullable<Int4>,
+        water_landings -> Nullable<Int4>,
+        land_landings -> Nullable<Int4>,
+        last_update -> Nullable<Varchar>,
+        launches -> Nullable<Array<Text>>,
+        serial -> Nullable<Varchar>,
+        status -> Nullable<Varchar>,
+        #[sql_name = "type"]
+        type_ -> Nullable<Varchar>,
+    }
+}
+
+table! {
     company_info (id) {
         id -> Varchar,
         name -> Nullable<Varchar>,
@@ -57,7 +72,7 @@ table! {
 }
 
 allow_tables_to_appear_in_same_query!(
+    capsules,
     company_info,
     roadster_info,
 );
- 

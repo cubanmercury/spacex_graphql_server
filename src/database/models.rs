@@ -1,7 +1,8 @@
 use serde_derive::Deserialize;
 
-use super::schema::roadster_info;
-use super::schema::company_info;
+// use super::schema::roadster_info;
+// use super::schema::company_info;
+use super::schema::*;
 
 #[derive(Queryable, Deserialize, Debug)]
 pub struct Roadster {
@@ -123,4 +124,31 @@ pub struct UpdateCompany<'a> {
   pub links_flickr: &'a String,
   pub links_twitter: &'a String,
   pub links_elon_twitter: &'a String,
+}
+
+#[derive(Debug, Deserialize, Queryable)]
+pub struct Capsules {
+  pub id: String,
+  pub reuse_count: Option<i32>,
+  pub water_landings: Option<i32>,
+  pub land_landings: Option<i32>,
+  pub last_update: Option<String>,
+  pub launches: Option<Vec<String>>,
+  pub serial: Option<String>,
+  pub status: Option<String>,
+  pub r#type: Option<String>,
+}
+
+#[derive(Insertable, AsChangeset)]
+#[table_name="capsules"]
+pub struct UpdateCapsules<'a> {
+  pub id: &'a str,
+  pub reuse_count: &'a i32,
+  pub water_landings: &'a i32,
+  pub land_landings: &'a i32,
+  pub last_update: &'a String,
+  pub launches: &'a Vec<String>,
+  pub serial: &'a String,
+  pub status: &'a String,
+  pub type_: &'a String,
 }
