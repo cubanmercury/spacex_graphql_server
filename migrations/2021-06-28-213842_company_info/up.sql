@@ -21,5 +21,6 @@ CREATE TABLE company_info
   links_flickr character varying,
   links_twitter character varying,
   links_elon_twitter character varying,
+  row_updated timestamp with time zone NOT NULL,
   CONSTRAINT company_info_pkey PRIMARY KEY (id)
 )

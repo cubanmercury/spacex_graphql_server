@@ -1,7 +1,6 @@
 use serde_derive::Deserialize;
+use chrono::{DateTime, Utc};
 
-// use super::schema::roadster_info;
-// use super::schema::company_info;
 use super::schema::*;
 
 #[derive(Queryable, Deserialize, Debug)]
@@ -34,8 +33,7 @@ pub struct Roadster {
   pub wikipedia: Option<String>,
   pub flickr_images: Option<Vec<String>>,
 }
-
-#[derive(Insertable)]
+#[derive(Insertable, AsChangeset)]
 #[table_name="roadster_info"]
 pub struct UpdateRoadster<'a> {
   pub apoapsis_au: &'a f64,
@@ -65,7 +63,9 @@ pub struct UpdateRoadster<'a> {
   pub video: &'a String,
   pub wikipedia: &'a String,
   pub flickr_images: &'a Vec<String>,
+  pub row_updated: &'a DateTime<Utc>,
 }
+
 
 #[derive(Debug, Deserialize, Queryable)]
 pub struct CompanyHeadquarters {
@@ -99,8 +99,7 @@ pub struct Company {
   pub headquarters: CompanyHeadquarters,
   pub links: CompanyLinks,
 }
-
-#[derive(Insertable)]
+#[derive(Insertable, AsChangeset)]
 #[table_name="company_info"]
 pub struct UpdateCompany<'a> {
   pub id: &'a str,
@@ -124,7 +123,9 @@ pub struct UpdateCompany<'a> {
   pub links_flickr: &'a String,
   pub links_twitter: &'a String,
   pub links_elon_twitter: &'a String,
+  pub row_updated: &'a DateTime<Utc>,
 }
+
 
 #[derive(Debug, Deserialize, Queryable)]
 pub struct Capsules {
@@ -138,7 +139,6 @@ pub struct Capsules {
   pub status: Option<String>,
   pub r#type: Option<String>,
 }
-
 #[derive(Insertable, AsChangeset)]
 #[table_name="capsules"]
 pub struct UpdateCapsules<'a> {
@@ -151,4 +151,218 @@ pub struct UpdateCapsules<'a> {
   pub serial: &'a String,
   pub status: &'a String,
   pub type_: &'a String,
+  pub row_updated: &'a DateTime<Utc>,
+}
+
+
+#[derive(Debug, Deserialize, Queryable)]
+pub struct Cores {
+  pub id: String,
+  pub block: Option<i32>,
+  pub reuse_count: Option<i32>,
+  pub rtls_attempts: Option<i32>,
+  pub rtls_landings: Option<i32>,
+  pub asds_attempts: Option<i32>,
+  pub asds_landings: Option<i32>,
+  pub last_update: Option<String>,
+  pub launches: Option<Vec<String>>,
+  pub serial: Option<String>,
+  pub status: Option<String>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="cores"]
+pub struct UpdateCores<'a> {
+  pub id: &'a str,
+  pub block: &'a i32,
+  pub reuse_count: &'a i32,
+  pub rtls_attempts: &'a i32,
+  pub rtls_landings: &'a i32,
+  pub asds_attempts: &'a i32,
+  pub asds_landings: &'a i32,
+  pub last_update: &'a String,
+  pub launches: &'a Vec<String>,
+  pub serial: &'a String,
+  pub status: &'a String,
+  pub row_updated: &'a DateTime<Utc>,
+}
+
+
+#[derive(Debug, Deserialize, Queryable)]
+pub struct Crew {
+  pub id: String,
+  pub name: Option<String>,
+  pub agency: Option<String>,
+  pub image: Option<String>,
+  pub wikipedia: Option<String>,
+  pub launches: Option<Vec<String>>,
+  pub status: Option<String>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="crew"]
+pub struct UpdateCrew<'a> {
+  pub id: &'a str,
+  pub name: &'a String,
+  pub agency: &'a String,
+  pub image: &'a String,
+  pub wikipedia: &'a String,
+  pub launches: &'a Vec<String>,
+  pub status: &'a String,
+  pub row_updated: &'a DateTime<Utc>,
+}
+
+
+#[derive(Debug, Deserialize, Queryable)]
+pub struct HeatShield {
+  material: Option<String>,
+  size_meters: Option<f64>,
+  temp_degrees: Option<i32>,
+  dev_partner: Option<String>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct Mass {
+  pub kg: Option<i32>,
+  pub lb: Option<i32>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct Volume {
+  pub cubic_meters: Option<i32>,
+  pub cubic_feet: Option<i32>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct Distance {
+  pub meters: Option<f64>,
+  pub feet: Option<f64>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct PressurizedCapsule {
+  pub payload_volume: Volume,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct Cargo {
+  pub solar_array: Option<i32>,
+  pub unpressurized_cargo: bool,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct Trunk {
+  pub trunk_volume: Volume,
+  pub cargo: Cargo,
+}
+#[derive(Debug, Deserialize, Queryable)]
+#[allow(non_snake_case)]
+pub struct Thrust {
+  pub kN: Option<f64>,
+  pub lbf: Option<f64>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct Thrusters {
+  pub r#type: Option<String>,
+  pub amount: Option<i32>,
+  pub pods: Option<i32>,
+  pub fuel_1: Option<String>,
+  pub fuel_2: Option<String>,
+  pub isp: Option<i32>,
+  pub thrust: Thrust,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct Dragons {
+  pub id: String,
+  pub heat_shield: HeatShield,
+  pub launch_payload_mass: Mass,
+  pub launch_payload_vol: Volume,
+  pub return_payload_mass: Mass,
+  pub return_payload_vol: Volume,
+  pub pressurized_capsule: PressurizedCapsule,
+  pub trunk: Trunk,
+  pub height_w_trunk: Distance,
+  pub diameter: Distance,
+  pub first_flight: Option<String>,
+  pub flickr_images: Option<Vec<String>>,
+  pub name: Option<String>,
+  pub r#type: Option<String>,
+  pub active: bool,
+  pub crew_capacity: Option<i32>,
+  pub sidewall_angle_deg: Option<i32>,
+  pub orbit_duration_yr: Option<i32>,
+  pub dry_mass_kg: Option<i32>,
+  pub dry_mass_lbs: Option<i32>,
+  pub thrusters: Vec<Thrusters>,
+  pub wikipedia: Option<String>,
+  pub description: Option<String>,
+}
+
+#[derive(Insertable, AsChangeset)]
+#[table_name="dragons_heat_shield"]
+pub struct UpdateDragonsHeatShield<'a> {
+  pub id: &'a i32,
+  pub dragon_id: &'a String,
+  pub material: &'a String,
+  pub size_meters: &'a f64,
+  pub temp_degrees: &'a i32,
+  pub dev_partner: &'a String,
+  pub row_updated: &'a DateTime<Utc>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="dragons_pressurized_capsule"]
+pub struct UpdateDragonsPressurizedCapsule<'a> {
+  pub id: &'a i32,
+  pub dragon_id: &'a String,
+  pub payload_volume_cubic_meters: &'a i32,
+  pub payload_volume_cubic_feet: &'a i32,
+  pub row_updated: &'a DateTime<Utc>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="dragons_trunk"]
+pub struct UpdateDragonsTrunk<'a> {
+  pub id: &'a i32,
+  pub dragon_id: &'a String,
+  pub trunk_volume_cubic_meters: &'a i32,
+  pub trunk_volume_cubic_feet: &'a i32,
+  pub cargo_solar_array: &'a i32,
+  pub cargo_unpressurized_cargo: &'a bool,
+  pub row_updated: &'a DateTime<Utc>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="dragons_thrusters"]
+pub struct UpdateDragonsThrusters<'a> {
+  pub id: &'a i32,
+  pub dragon_id: &'a String,
+  pub type_: &'a String,
+  pub amount: &'a i32,
+  pub pods: &'a i32,
+  pub fuel_1: &'a String,
+  pub fuel_2: &'a String,
+  pub isp: &'a i32,
+  pub thrust_kn: &'a f64,
+  pub thrust_lbf: &'a f64,
+  pub row_updated: &'a DateTime<Utc>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="dragons"]
+pub struct UpdateDragons<'a> {
+  pub dragon_id: &'a str,
+  pub launch_payload_mass_kg: &'a i32,
+  pub launch_payload_mass_lbs: &'a i32,
+  pub launch_payload_vol_cubic_meters: &'a i32,
+  pub launch_payload_vol_cubic_feet: &'a i32,
+  pub return_payload_mass_kg: &'a i32,
+  pub return_payload_mass_lbs: &'a i32,
+  pub return_payload_vol_cubic_meters: &'a i32,
+  pub return_payload_vol_cubic_feet: &'a i32,
+  pub height_w_trunk_meters: &'a f64,
+  pub height_w_trunk_feet: &'a f64,
+  pub diameter_meters: &'a f64,
+  pub diameter_feet: &'a f64,
+  pub first_flight: &'a String,
+  pub flickr_images: &'a Vec<String>,
+  pub name: &'a String,
+  pub type_: &'a String,
+  pub active: &'a bool,
+  pub crew_capacity: &'a i32,
+  pub sidewall_angle_deg: &'a i32,
+  pub orbit_duration_yr: &'a i32,
+  pub dry_mass_kg: &'a i32,
+  pub dry_mass_lbs: &'a i32,
+  pub wikipedia: &'a String,
+  pub description: &'a String,
+  pub row_updated: &'a DateTime<Utc>,
 }

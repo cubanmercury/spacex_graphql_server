@@ -2,12 +2,13 @@ use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use dotenv::dotenv;
 use std::env;
+use chrono::{Date, DateTime, Utc};
 
 
 use crate::database::models::*;
 use crate::database::schema::*;
 
-
+// Database connection PgConnection
 pub fn establish_connection() -> PgConnection {
   dotenv().ok();
 
@@ -22,7 +23,8 @@ pub fn establish_connection() -> PgConnection {
 pub fn create_roadster<'a>(
   conn: &PgConnection,
   roadster_details: &'a Roadster
-) -> Roadster {
+) {
+  let now: DateTime<Utc> = Utc::now();
 
   let new_roadster_entry = UpdateRoadster {
     apoapsis_au: &roadster_details.apoapsis_au.unwrap(),
@@ -51,13 +53,17 @@ pub fn create_roadster<'a>(
     speed_mph: &roadster_details.speed_mph.unwrap(),
     video: &roadster_details.video.as_ref().unwrap(),
     wikipedia: &roadster_details.wikipedia.as_ref().unwrap(),
-    flickr_images: &roadster_details.flickr_images.as_ref().unwrap()
+    flickr_images: &roadster_details.flickr_images.as_ref().unwrap(),
+    row_updated: &now,
   };
 
   diesel::insert_into(roadster_info::table)
     .values(&new_roadster_entry)
-    .get_result(conn)
-    .expect("Error saving entry to Roadster_info!")
+    .on_conflict(roadster_info::id)
+    .do_update()
+    .set(&new_roadster_entry)
+    .execute(conn)
+    .expect("Error saving entry to Roadster_info!");
 }
 
 // Method to remove roadster row from roadster_info table by ID
@@ -81,6 +87,8 @@ pub fn create_company<'a>(
   conn: &PgConnection,
   company_details: &'a Company
 ) {
+  let now: DateTime<Utc> = Utc::now();
+
   let new_company_entry = UpdateCompany {
     id: &company_details.id,
     name: &company_details.name.as_ref().unwrap(),
@@ -103,10 +111,14 @@ pub fn create_company<'a>(
     links_flickr: &company_details.links.flickr.as_ref().unwrap(),
     links_twitter: &company_details.links.twitter.as_ref().unwrap(),
     links_elon_twitter: &company_details.links.elon_twitter.as_ref().unwrap(),
+    row_updated: &now,
   };
 
   diesel::insert_into(company_info::table)
     .values(&new_company_entry)
+    .on_conflict(company_info::id)
+    .do_update()
+    .set(&new_company_entry)
     .execute(conn)
     .expect("Error saving entry to company_info");
 }
@@ -130,6 +142,9 @@ pub fn add_capsule<'a>(
   conn: &PgConnection,
   capsule_details: &'a Capsules
 ) {
+
+  let now: DateTime<Utc> = Utc::now();
+
   let new_capsule = UpdateCapsules {
     id: &capsule_details.id,
     reuse_count: &capsule_details.reuse_count.unwrap(),
@@ -140,9 +155,10 @@ pub fn add_capsule<'a>(
     serial: &capsule_details.serial.as_ref().unwrap(),
     status: &capsule_details.status.as_ref().unwrap(),
     type_: &capsule_details.r#type.as_ref().unwrap(),
+    row_updated: &now,
   };
 
-  // Push row into capsules table, if a conflict is found the row is skipped.
+  // Push row into capsules table, if a conflict is found the row is updated.
   diesel::insert_into(capsules::table)
     .values(&new_capsule)
     .on_conflict(capsules::id)
@@ -151,4 +167,102 @@ pub fn add_capsule<'a>(
     .set(&new_capsule)
     .execute(conn)
     .expect("Error saving entry to capsules table");
+}
+
+// Method to push row into database table['cores']
+pub fn add_core<'a>(
+  conn: &PgConnection,
+  core_details: &'a Cores
+) {
+  let now: DateTime<Utc> = Utc::now();
+
+  let new_core = UpdateCores {
+    id: &core_details.id,
+    block: &core_details.block.clone().unwrap_or(0),
+    reuse_count: &core_details.reuse_count.unwrap(),
+    rtls_attempts: &core_details.rtls_attempts.unwrap(),
+    rtls_landings: &core_details.rtls_landings.unwrap(),
+    asds_attempts: &core_details.asds_attempts.unwrap(),
+    asds_landings: &core_details.asds_landings.unwrap(),
+    last_update: &core_details.last_update.clone().unwrap_or(String::from("No update found")),
+    launches: &core_details.launches.as_ref().unwrap(),
+    serial: &core_details.serial.as_ref().unwrap(),
+    status: &core_details.status.as_ref().unwrap(),
+    row_updated: &now,
+  };
+
+  // Push new row into cores table, if a conflict is found the row is updated.
+  diesel::insert_into(cores::table)
+    .values(&new_core)
+    .on_conflict(cores::id)
+    .do_update()
+    .set(&new_core)
+    .execute(conn)
+    .expect("Error saving entry into cores table");
+}
+
+// Method to push row into database table['crew']
+pub fn add_crew_member<'a>(
+  conn: &PgConnection,
+  crew_details: &'a Crew
+) {
+  let now: DateTime<Utc> = Utc::now();
+
+  let new_member = UpdateCrew {
+    id: &crew_details.id,
+    name: &crew_details.name.as_ref().unwrap(),
+    agency: &crew_details.agency.as_ref().unwrap(),
+    image: &crew_details.image.as_ref().unwrap(),
+    wikipedia: &crew_details.wikipedia.as_ref().unwrap(),
+    launches: &crew_details.launches.as_ref().unwrap(),
+    status: &crew_details.status.as_ref().unwrap(),
+    row_updated: &now,
+  };
+
+  diesel::insert_into(crew::table)
+    .values(&new_member)
+    .on_conflict(crew::id)
+    .do_update()
+    .set(&new_member)
+    .execute(conn)
+    .expect("Error saving entry into crew table");
+}
+
+// Method to push row into database tables['dragons', 'dragons_heat_shield', 'dragons_pressurized_capsule', 'dragons_trunk', 'dragons_thrusters']
+pub fn add_dragon<'a>(
+  conn: &PgConnection,
+  dragon_details: &'a Dragons
+) {
+  let now: DateTime<Utc> = Utc::now();
+
+  let new_dragon_entry = UpdateDragons {
+    dragon_id: &dragon_details.id,
+    launch_payload_mass_kg: &dragon_details.launch_payload_mass.kg.unwrap(),
+    launch_payload_mass_lbs: &dragon_details.launch_payload_mass.lb.unwrap(),
+    launch_payload_vol_cubic_meters: &dragon_details.launch_payload_vol.cubic_meters.unwrap(),
+    launch_payload_vol_cubic_feet: &dragon_details.launch_payload_vol.cubic_feet.unwrap(),
+    return_payload_mass_kg: &dragon_details.return_payload_mass.kg.unwrap(),
+    return_payload_mass_lbs: &dragon_details.return_payload_mass.lb.unwrap(),
+    return_payload_vol_cubic_meters: &dragon_details.return_payload_vol.cubic_meters.unwrap(),
+    return_payload_vol_cubic_feet: &dragon_details.return_payload_vol.cubic_feet.unwrap(),
+    height_w_trunk_meters: &dragon_details.height_w_trunk.meters.unwrap(),
+    height_w_trunk_feet: &dragon_details.height_w_trunk.feet.unwrap(),
+    diameter_meters: &dragon_details.diameter.meters.unwrap(),
+    diameter_feet: &dragon_details.diameter.feet.unwrap(),
+    first_flight: &dragon_details.first_flight.as_ref().unwrap(),
+    flickr_images: &dragon_details.flickr_images.as_ref().unwrap(),
+    name: &dragon_details.name.as_ref().unwrap(),
+    type_: &dragon_details.r#type.as_ref().unwrap(),
+    active: &dragon_details.active,
+    crew_capacity: &dragon_details.crew_capacity.unwrap(),
+    sidewall_angle_deg: &dragon_details.sidewall_angle_deg.unwrap(),
+    orbit_duration_yr: &dragon_details.orbit_duration_yr.unwrap(),
+    dry_mass_kg: &dragon_details.dry_mass_kg.unwrap(),
+    dry_mass_lbs: &dragon_details.dry_mass_lbs.unwrap(),
+    wikipedia: &dragon_details.wikipedia.as_ref().unwrap(),
+    description: &dragon_details.description.as_ref().unwrap(),
+    row_updated: &now,
+  };
+
+  
 }

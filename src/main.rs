@@ -105,8 +105,6 @@ async fn main() -> io::Result<()> {
     // println!("ahhhhhhhhhhhhh3");
     match capsules {
         Ok(info) => {
-            println!("Capsule data: {:?}", info);
-            println!("ahhhhhhhhhhhhhh4");
             for cap in info {
                 println!("capsule: {:?}", cap);
                 handle_push_capsules_to_db(cap);
@@ -120,7 +118,55 @@ async fn main() -> io::Result<()> {
     fn handle_push_capsules_to_db(info: database::models::Capsules) {
         let conn = operations::establish_connection();
         operations::add_capsule(&conn, &info);
+    };
+
+    let cores = queryspacex::get_cores().await;
+    match cores {
+        Ok(info) => {
+            for core in info {
+                println!("Core data: {:?}", core);
+                handle_push_cores_to_db(core);
+            }
+        }
+        Err(e) => {
+            println!("Error getting cores: {:?}", e)
+        }
+    };
+    fn handle_push_cores_to_db(info: database::models::Cores) {
+        let conn = operations::establish_connection();
+        operations::add_core(&conn, &info);
     }
+
+    let crew = queryspacex::get_crew().await;
+    match crew {
+        Ok(info) => {
+            for member in info {
+                println!("Crew member: {:?}", member);
+                handle_push_crew_to_db(member);
+            }
+        }
+        Err(e) => {
+            println!("Error getting crew: {:?}", e)
+        }
+    };
+    fn handle_push_crew_to_db(info: database::models::Crew) {
+        let conn = operations::establish_connection();
+        operations::add_crew_member(&conn, &info);
+    }
+
+    let dragons = queryspacex::get_dragons().await;
+    match dragons {
+        Ok(info) => {
+            for dragon in info {
+                println!("Dragon: {:?}", dragon);
+            }
+        }
+        Err(e) => {
+            println!("Error getting Dragons: {:?}", e);
+        }
+    };
+
+
 
     HttpServer::new(|| {
         App::new()

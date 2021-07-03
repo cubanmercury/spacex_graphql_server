@@ -9,5 +9,6 @@ CREATE TABLE capsules
   serial character varying,
   status character varying,
   type character varying,
+  row_updated timestamp with time zone NOT NULL,
   CONSTRAINT capsules_pkey PRIMARY KEY (id)
 )

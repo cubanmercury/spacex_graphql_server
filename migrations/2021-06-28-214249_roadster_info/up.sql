@@ -27,5 +27,6 @@ CREATE TABLE roadster_info
     video character varying COLLATE pg_catalog."default",
     wikipedia character varying COLLATE pg_catalog."default",
     flickr_images text[] COLLATE pg_catalog."default",
+    row_updated timestamp with time zone NOT NULL,
     CONSTRAINT roadster_info_pkey PRIMARY KEY (id)
 )

@@ -1,0 +1,1 @@
+DROP TABLE dragons_heat_shield

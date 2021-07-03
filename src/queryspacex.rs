@@ -212,6 +212,7 @@ pub async fn get_company_info() -> Result<Company, actix_web::client::JsonPayloa
     return company_info;
 }
 
+// Query SpaceX_API for Capsules info
 pub async fn get_capsules() -> Result<Vec<Capsules>, actix_web::client::JsonPayloadError> {
     let endpoint = String::from("https://api.spacexdata.com/v4/capsules");
     let response = get_client(&endpoint).await;
@@ -234,4 +235,79 @@ pub async fn get_capsules() -> Result<Vec<Capsules>, actix_web::client::JsonPayl
     };
 
     return capsules;
+}
+
+// Query SpaceX_API for Cores info
+pub async fn get_cores() -> Result<Vec<Cores>, actix_web::client::JsonPayloadError> {
+    let endpoint = String::from("https://api.spacexdata.com/v4/cores");
+    let response = get_client(&endpoint).await;
+
+    let cores: Result<_,_>;
+
+    match response
+        .expect("Error getting JSON data for get_cores()")
+        .json::<Vec<Cores>>()
+        .await
+    {
+        Ok(v) => {
+            println!("Cores JSON data: {:?}", v);
+            cores = Ok(v)
+        }
+        Err(e) => {
+            println!("Error getting Cores data: {:?}", e);
+            cores = Err(e)
+        }
+    };
+
+    return cores;
+}
+
+// Query SpaceX_API for Crew info
+pub async fn get_crew() -> Result<Vec<Crew>, actix_web::client::JsonPayloadError> {
+    let endpoint = String::from("https://api.spacexdata.com/v4/crew");
+    let response = get_client(&endpoint).await;
+
+    let crew: Result<_,_>;
+
+    match response
+        .expect("Error getting JSON data for get_crew()")
+        .json::<Vec<Crew>>()
+        .await
+    {
+        Ok(v) => {
+            println!("Crew JSON data: {:?}", v);
+            crew = Ok(v)
+        }
+        Err(e) => {
+            println!("Error getting Crew data: {:?}", e);
+            crew = Err(e)
+        }
+    };
+
+    return crew;
+}
+
+// Query SpaceX_API for Dragons info
+pub async fn get_dragons() -> Result<Vec<Dragons>, actix_web::client::JsonPayloadError> {
+    let endpoint = String::from("https://api.spacexdata.com/v4/dragons");
+    let response = get_client(&endpoint).await;
+
+    let dragons: Result<_,_>;
+
+    match response
+        .expect("Error getting JSON data for get_dragons()")
+        .json::<Vec<Dragons>>()
+        .await
+    {
+        Ok(v) => {
+            println!("Dragon JSON data: {:?}", v);
+            dragons = Ok(v);
+        }
+        Err(e) => {
+            println!("Error getting Dragon data: {:?}", e);
+            dragons = Err(e);
+        }
+    };
+
+    return dragons;
 }
