@@ -330,3 +330,26 @@ pub fn add_dragon<'a>(conn: &PgConnection, dragon_details: &'a Dragons) {
       .expect("Error saving entry into dragons_thrusters table");
   }
 }
+
+// Method to push row into database table['history']
+pub fn add_history<'a>(conn: &PgConnection, history_details: &'a History) {
+  let now: DateTime<Utc> = Utc::now();
+
+  let new_history_entry = UpdateHistory {
+    id: &history_details.id,
+    title: &history_details.title.as_ref().unwrap(),
+    event_date_utc: &history_details.event_date_utc.as_ref().unwrap(),
+    event_date_unix: &history_details.event_date_unix.unwrap(),
+    details: &history_details.details.as_ref().unwrap(),
+    links_article: &history_details.links.article.clone().unwrap_or("".to_string()),
+    row_updated: &now,
+  };
+
+  diesel::insert_into(history::table)
+    .values(&new_history_entry)
+    .on_conflict(history::id)
+    .do_update()
+    .set(&new_history_entry)
+    .execute(conn)
+    .expect("Error saving entry into history table");
+}

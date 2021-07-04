@@ -171,6 +171,23 @@ async fn main() -> io::Result<()> {
         operations::add_dragon(&conn, &info);
     }
 
+    let history = queryspacex::get_history().await;
+    match history {
+        Ok(info) => {
+            println!("History: {:?}", info);
+            for event in info {
+                handle_push_history_to_db(event);
+            }
+        }
+        Err(e) => {
+            println!("Error getting history: {:?}", e);
+        }
+    };
+    fn handle_push_history_to_db(info: database::models::History) {
+        let conn = operations::establish_connection();
+        operations::add_history(&conn, &info);
+    }
+
 
 
     HttpServer::new(|| {

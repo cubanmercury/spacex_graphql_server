@@ -363,3 +363,29 @@ pub struct UpdateDragons<'a> {
   pub description: &'a String,
   pub row_updated: &'a DateTime<Utc>,
 }
+
+#[derive(Debug, Deserialize, Queryable)]
+pub struct HistoryLinks {
+  pub article: Option<String>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct History {
+  pub id: String,
+  pub title: Option<String>,
+  pub event_date_utc: Option<String>,
+  pub event_date_unix: Option<i32>,
+  pub details: Option<String>,
+  pub links: HistoryLinks,
+}
+
+#[derive(Insertable, AsChangeset)]
+#[table_name="history"]
+pub struct UpdateHistory<'a> {
+  pub id: &'a str,
+  pub title: &'a String,
+  pub event_date_utc: &'a String,
+  pub event_date_unix: &'a i32,
+  pub details: &'a String,
+  pub links_article: &'a String,
+  pub row_updated: &'a DateTime<Utc>,
+}

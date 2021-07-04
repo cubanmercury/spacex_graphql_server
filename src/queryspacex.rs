@@ -175,7 +175,6 @@ pub async fn get_roadster_info() -> Result<Roadster, actix_web::client::JsonPayl
         .await
     {
         Ok(v) => {
-            println!("Roadster JSON data: {:?}", v);
             roadster_info = Ok(v);
         }
         Err(e) => {
@@ -199,10 +198,7 @@ pub async fn get_company_info() -> Result<Company, actix_web::client::JsonPayloa
         .json::<Company>()
         .await
     {
-        Ok(v) => {
-            println!("company JSON data: {:?}", v);
-            company_info = Ok(v);
-        }
+        Ok(v) => company_info = Ok(v),
         Err(e) => {
             println!("Error getting Company JSON data: {:?}", e);
             company_info = Err(e);
@@ -217,17 +213,14 @@ pub async fn get_capsules() -> Result<Vec<Capsules>, actix_web::client::JsonPayl
     let endpoint = String::from("https://api.spacexdata.com/v4/capsules");
     let response = get_client(&endpoint).await;
 
-    let capsules: Result<_,_>;
+    let capsules: Result<_, _>;
 
     match response
         .expect("Error getting JSON data for get_capsules")
         .json::<Vec<Capsules>>()
         .await
     {
-        Ok(v) => {
-            println!("Capsule JSON data: {:?}", v);
-            capsules = Ok(v)
-        }
+        Ok(v) => capsules = Ok(v),
         Err(e) => {
             println!("Error getting Capsule JSON data: {:?}", e);
             capsules = Err(e);
@@ -242,17 +235,14 @@ pub async fn get_cores() -> Result<Vec<Cores>, actix_web::client::JsonPayloadErr
     let endpoint = String::from("https://api.spacexdata.com/v4/cores");
     let response = get_client(&endpoint).await;
 
-    let cores: Result<_,_>;
+    let cores: Result<_, _>;
 
     match response
         .expect("Error getting JSON data for get_cores()")
         .json::<Vec<Cores>>()
         .await
     {
-        Ok(v) => {
-            println!("Cores JSON data: {:?}", v);
-            cores = Ok(v)
-        }
+        Ok(v) => cores = Ok(v),
         Err(e) => {
             println!("Error getting Cores data: {:?}", e);
             cores = Err(e)
@@ -267,17 +257,14 @@ pub async fn get_crew() -> Result<Vec<Crew>, actix_web::client::JsonPayloadError
     let endpoint = String::from("https://api.spacexdata.com/v4/crew");
     let response = get_client(&endpoint).await;
 
-    let crew: Result<_,_>;
+    let crew: Result<_, _>;
 
     match response
         .expect("Error getting JSON data for get_crew()")
         .json::<Vec<Crew>>()
         .await
     {
-        Ok(v) => {
-            println!("Crew JSON data: {:?}", v);
-            crew = Ok(v)
-        }
+        Ok(v) => crew = Ok(v),
         Err(e) => {
             println!("Error getting Crew data: {:?}", e);
             crew = Err(e)
@@ -292,7 +279,7 @@ pub async fn get_dragons() -> Result<Vec<Dragons>, actix_web::client::JsonPayloa
     let endpoint = String::from("https://api.spacexdata.com/v4/dragons");
     let response = get_client(&endpoint).await;
 
-    let dragons: Result<_,_>;
+    let dragons: Result<_, _>;
 
     match response
         .expect("Error getting JSON data for get_dragons()")
@@ -300,7 +287,6 @@ pub async fn get_dragons() -> Result<Vec<Dragons>, actix_web::client::JsonPayloa
         .await
     {
         Ok(v) => {
-            println!("Dragon JSON data: {:?}", v);
             dragons = Ok(v);
         }
         Err(e) => {
@@ -310,4 +296,26 @@ pub async fn get_dragons() -> Result<Vec<Dragons>, actix_web::client::JsonPayloa
     };
 
     return dragons;
+}
+
+// Query SpaceX_API for Hisoric Events info
+pub async fn get_history() -> Result<Vec<History>, actix_web::client::JsonPayloadError> {
+    let endpoint = String::from("https://api.spacexdata.com/v4/history");
+    let response = get_client(&endpoint).await;
+
+    let history: Result<_, _>;
+
+    match response
+        .expect("Error getting JSON data for get_history()")
+        .json::<Vec<History>>()
+        .await
+    {
+        Ok(v) => history = Ok(v),
+        Err(e) => {
+            println!("Error getting History data: {:?}", e);
+            history = Err(e);
+        }
+    };
+
+    return history;
 }

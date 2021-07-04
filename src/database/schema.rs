@@ -155,6 +155,18 @@ table! {
 }
 
 table! {
+    history (id) {
+        id -> Varchar,
+        title -> Nullable<Varchar>,
+        event_date_utc -> Nullable<Varchar>,
+        event_date_unix -> Nullable<Int4>,
+        details -> Nullable<Text>,
+        links_article -> Nullable<Varchar>,
+        row_updated -> Timestamptz,
+    }
+}
+
+table! {
     roadster_info (id) {
         apoapsis_au -> Nullable<Float8>,
         details -> Nullable<Text>,
@@ -197,5 +209,6 @@ allow_tables_to_appear_in_same_query!(
     dragons_pressurized_capsule,
     dragons_thrusters,
     dragons_trunk,
+    history,
     roadster_info,
 );
