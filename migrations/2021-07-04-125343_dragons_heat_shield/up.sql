@@ -10,5 +10,6 @@ CREATE TABLE dragons_heat_shield
   CONSTRAINT dragons_heat_shield_pkey PRIMARY KEY (id),
   CONSTRAINT fk_dragons
     FOREIGN KEY(dragon_id)
-      REFERENCES dragons(dragon_id)
+      REFERENCES dragons(dragon_id),
+  UNIQUE(dragon_id)
 )

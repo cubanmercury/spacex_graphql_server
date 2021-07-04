@@ -127,7 +127,7 @@ table! {
 
 table! {
     dragons_thrusters (id) {
-        id -> Int4,
+        id -> Varchar,
         dragon_id -> Varchar,
         #[sql_name = "type"]
         type_ -> Nullable<Varchar>,

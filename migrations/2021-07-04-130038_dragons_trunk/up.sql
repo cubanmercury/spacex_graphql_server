@@ -10,5 +10,6 @@ CREATE TABLE dragons_trunk
   CONSTRAINT dragons_trunk_pkey PRIMARY KEY (id),
   CONSTRAINT fk_dragons
     FOREIGN KEY(dragon_id)
-      REFERENCES dragons(dragon_id)
+      REFERENCES dragons(dragon_id),
+  UNIQUE(dragon_id)
 )

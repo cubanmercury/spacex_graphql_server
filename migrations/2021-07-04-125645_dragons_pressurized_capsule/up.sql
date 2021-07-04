@@ -8,5 +8,6 @@ CREATE TABLE dragons_pressurized_capsule
   CONSTRAINT dragons_pressurized_capsule_pkey PRIMARY KEY (id),
   CONSTRAINT fk_dragons
     FOREIGN KEY(dragon_id)
-      REFERENCES dragons(dragon_id)
+      REFERENCES dragons(dragon_id),
+  UNIQUE(dragon_id)
 )

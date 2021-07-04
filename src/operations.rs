@@ -1,9 +1,8 @@
-use diesel::prelude::*;
+use chrono::{DateTime, Utc};
 use diesel::pg::PgConnection;
+use diesel::prelude::*;
 use dotenv::dotenv;
 use std::env;
-use chrono::{Date, DateTime, Utc};
-
 
 use crate::database::models::*;
 use crate::database::schema::*;
@@ -12,18 +11,13 @@ use crate::database::schema::*;
 pub fn establish_connection() -> PgConnection {
   dotenv().ok();
 
-  let database_url = env::var("DATABASE_URL")
-    .expect("DATABASE_URL is not set");
+  let database_url = env::var("DATABASE_URL").expect("DATABASE_URL is not set");
 
-  PgConnection::establish(&database_url)
-    .expect(&format!("Error connecting to {}", database_url))
+  PgConnection::establish(&database_url).expect(&format!("Error connecting to {}", database_url))
 }
 
 // Method to add roadster_info to database table['roadster_info']
-pub fn create_roadster<'a>(
-  conn: &PgConnection,
-  roadster_details: &'a Roadster
-) {
+pub fn create_roadster<'a>(conn: &PgConnection, roadster_details: &'a Roadster) {
   let now: DateTime<Utc> = Utc::now();
 
   let new_roadster_entry = UpdateRoadster {
@@ -67,11 +61,8 @@ pub fn create_roadster<'a>(
 }
 
 // Method to remove roadster row from roadster_info table by ID
-pub fn delete_roadster_by_id<'a>(
-  conn: &PgConnection,
-  roadster_details: &'a Roadster
-) {
-  use roadster_info::dsl::{roadster_info};
+pub fn delete_roadster_by_id<'a>(conn: &PgConnection, roadster_details: &'a Roadster) {
+  use roadster_info::dsl::roadster_info;
 
   let roadster_id = &roadster_details.id;
 
@@ -83,10 +74,7 @@ pub fn delete_roadster_by_id<'a>(
 }
 
 // Method to add company_info to database table['company_info']
-pub fn create_company<'a>(
-  conn: &PgConnection,
-  company_details: &'a Company
-) {
+pub fn create_company<'a>(conn: &PgConnection, company_details: &'a Company) {
   let now: DateTime<Utc> = Utc::now();
 
   let new_company_entry = UpdateCompany {
@@ -123,26 +111,18 @@ pub fn create_company<'a>(
     .expect("Error saving entry to company_info");
 }
 // Method to remove company row from company_info table by ID
-pub fn delete_company_by_id<'a>(
-  conn: &PgConnection,
-  company_details: &'a Company
-) {
-  use company_info::dsl::{company_info};
+pub fn delete_company_by_id<'a>(conn: &PgConnection, company_details: &'a Company) {
+  use company_info::dsl::company_info;
   let company_row_id = &company_details.id;
 
   let company_to_delete = diesel::delete(company_info.find(company_row_id))
     .execute(conn)
     .expect("Unable to delete Company entry");
-  
   println!("Deleted {} Company entry", company_to_delete);
 }
 
 // Method to push a row into database table['capsules']
-pub fn add_capsule<'a>(
-  conn: &PgConnection,
-  capsule_details: &'a Capsules
-) {
-
+pub fn add_capsule<'a>(conn: &PgConnection, capsule_details: &'a Capsules) {
   let now: DateTime<Utc> = Utc::now();
 
   let new_capsule = UpdateCapsules {
@@ -150,7 +130,10 @@ pub fn add_capsule<'a>(
     reuse_count: &capsule_details.reuse_count.unwrap(),
     water_landings: &capsule_details.water_landings.unwrap(),
     land_landings: &capsule_details.land_landings.unwrap(),
-    last_update: &capsule_details.last_update.clone().unwrap_or(String::from("No update found")),
+    last_update: &capsule_details
+      .last_update
+      .clone()
+      .unwrap_or(String::from("No update found")),
     launches: &capsule_details.launches.as_ref().unwrap(),
     serial: &capsule_details.serial.as_ref().unwrap(),
     status: &capsule_details.status.as_ref().unwrap(),
@@ -170,10 +153,7 @@ pub fn add_capsule<'a>(
 }
 
 // Method to push row into database table['cores']
-pub fn add_core<'a>(
-  conn: &PgConnection,
-  core_details: &'a Cores
-) {
+pub fn add_core<'a>(conn: &PgConnection, core_details: &'a Cores) {
   let now: DateTime<Utc> = Utc::now();
 
   let new_core = UpdateCores {
@@ -184,7 +164,10 @@ pub fn add_core<'a>(
     rtls_landings: &core_details.rtls_landings.unwrap(),
     asds_attempts: &core_details.asds_attempts.unwrap(),
     asds_landings: &core_details.asds_landings.unwrap(),
-    last_update: &core_details.last_update.clone().unwrap_or(String::from("No update found")),
+    last_update: &core_details
+      .last_update
+      .clone()
+      .unwrap_or(String::from("No update found")),
     launches: &core_details.launches.as_ref().unwrap(),
     serial: &core_details.serial.as_ref().unwrap(),
     status: &core_details.status.as_ref().unwrap(),
@@ -202,10 +185,7 @@ pub fn add_core<'a>(
 }
 
 // Method to push row into database table['crew']
-pub fn add_crew_member<'a>(
-  conn: &PgConnection,
-  crew_details: &'a Crew
-) {
+pub fn add_crew_member<'a>(conn: &PgConnection, crew_details: &'a Crew) {
   let now: DateTime<Utc> = Utc::now();
 
   let new_member = UpdateCrew {
@@ -229,10 +209,7 @@ pub fn add_crew_member<'a>(
 }
 
 // Method to push row into database tables['dragons', 'dragons_heat_shield', 'dragons_pressurized_capsule', 'dragons_trunk', 'dragons_thrusters']
-pub fn add_dragon<'a>(
-  conn: &PgConnection,
-  dragon_details: &'a Dragons
-) {
+pub fn add_dragon<'a>(conn: &PgConnection, dragon_details: &'a Dragons) {
   let now: DateTime<Utc> = Utc::now();
 
   let new_dragon_entry = UpdateDragons {
@@ -258,11 +235,98 @@ pub fn add_dragon<'a>(
     sidewall_angle_deg: &dragon_details.sidewall_angle_deg.unwrap(),
     orbit_duration_yr: &dragon_details.orbit_duration_yr.unwrap(),
     dry_mass_kg: &dragon_details.dry_mass_kg.unwrap(),
-    dry_mass_lbs: &dragon_details.dry_mass_lbs.unwrap(),
+    dry_mass_lbs: &dragon_details.dry_mass_lb.unwrap(),
     wikipedia: &dragon_details.wikipedia.as_ref().unwrap(),
     description: &dragon_details.description.as_ref().unwrap(),
     row_updated: &now,
   };
 
-  
+  let new_dragon_heat_shield_entry = UpdateDragonsHeatShield {
+    dragon_id: &dragon_details.id,
+    material: &dragon_details.heat_shield.material.as_ref().unwrap(),
+    size_meters: &dragon_details.heat_shield.size_meters.unwrap(),
+    temp_degrees: &dragon_details.heat_shield.temp_degrees.unwrap(),
+    dev_partner: &dragon_details.heat_shield.dev_partner.as_ref().unwrap(),
+    row_updated: &now,
+  };
+
+  let new_dragon_pressurized_capsule_entry = UpdateDragonsPressurizedCapsule {
+    dragon_id: &dragon_details.id,
+    payload_volume_cubic_meters: &dragon_details
+      .pressurized_capsule
+      .payload_volume
+      .cubic_meters
+      .unwrap(),
+    payload_volume_cubic_feet: &dragon_details
+      .pressurized_capsule
+      .payload_volume
+      .cubic_feet
+      .unwrap(),
+    row_updated: &now,
+  };
+
+  let new_dragon_trunk_entry = UpdateDragonsTrunk {
+    dragon_id: &dragon_details.id,
+    trunk_volume_cubic_meters: &dragon_details.trunk.trunk_volume.cubic_meters.unwrap(),
+    trunk_volume_cubic_feet: &dragon_details.trunk.trunk_volume.cubic_feet.unwrap(),
+    cargo_solar_array: &dragon_details.trunk.cargo.solar_array.unwrap(),
+    cargo_unpressurized_cargo: &dragon_details.trunk.cargo.unpressurized_cargo,
+    row_updated: &now,
+  };
+
+  diesel::insert_into(dragons::table)
+    .values(&new_dragon_entry)
+    .on_conflict(dragons::dragon_id)
+    .do_update()
+    .set(&new_dragon_entry)
+    .execute(conn)
+    .expect("Error saving entry into dragons table");
+
+  diesel::insert_into(dragons_heat_shield::table)
+    .values(&new_dragon_heat_shield_entry)
+    .on_conflict(dragons_heat_shield::dragon_id)
+    .do_update()
+    .set(&new_dragon_heat_shield_entry)
+    .execute(conn)
+    .expect("Error saving entry into dragons_heat_shield table");
+
+  diesel::insert_into(dragons_pressurized_capsule::table)
+    .values(&new_dragon_pressurized_capsule_entry)
+    .on_conflict(dragons_pressurized_capsule::dragon_id)
+    .do_update()
+    .set(&new_dragon_pressurized_capsule_entry)
+    .execute(conn)
+    .expect("Error saving entry into dragons_pressurized_capsule table");
+
+  diesel::insert_into(dragons_trunk::table)
+    .values(&new_dragon_trunk_entry)
+    .on_conflict(dragons_trunk::dragon_id)
+    .do_update()
+    .set(&new_dragon_trunk_entry)
+    .execute(conn)
+    .expect("Error saving entry into dragons_trunk table");
+
+  for (index, thruster) in dragon_details.thrusters.iter().enumerate() {
+    let new_dragon_thrusters_entry = UpdateDragonsThrusters {
+      id: &format!("{}{}{}", &dragon_details.id, "_", index.to_string()),
+      dragon_id: &dragon_details.id,
+      type_: &thruster.r#type.as_ref().unwrap(),
+      amount: &thruster.amount.unwrap(),
+      pods: &thruster.pods.unwrap(),
+      fuel_1: &thruster.fuel_1.as_ref().unwrap(),
+      fuel_2: &thruster.fuel_2.as_ref().unwrap(),
+      isp: &thruster.isp.unwrap(),
+      thrust_kn: &thruster.thrust.kN.unwrap(),
+      thrust_lbf: &thruster.thrust.lbf.unwrap(),
+      row_updated: &now,
+    };
+
+    diesel::insert_into(dragons_thrusters::table)
+      .values(&new_dragon_thrusters_entry)
+      .on_conflict(dragons_thrusters::id)
+      .do_update()
+      .set(&new_dragon_thrusters_entry)
+      .execute(conn)
+      .expect("Error saving entry into dragons_thrusters table");
+  }
 }

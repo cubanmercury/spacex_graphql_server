@@ -1,6 +1,6 @@
 CREATE TABLE dragons_thrusters
 (
-  id INT GENERATED ALWAYS AS IDENTITY,
+  id character varying NOT NULL,
   dragon_id character varying NOT NULL,
   type character varying,
   amount Int,

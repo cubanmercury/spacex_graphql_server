@@ -159,12 +159,17 @@ async fn main() -> io::Result<()> {
         Ok(info) => {
             for dragon in info {
                 println!("Dragon: {:?}", dragon);
+                handle_push_dragon_to_db(dragon);
             }
         }
         Err(e) => {
             println!("Error getting Dragons: {:?}", e);
         }
     };
+    fn handle_push_dragon_to_db(info: database::models::Dragons) {
+        let conn = operations::establish_connection();
+        operations::add_dragon(&conn, &info);
+    }
 
 
 

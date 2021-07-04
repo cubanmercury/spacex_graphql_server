@@ -213,10 +213,10 @@ pub struct UpdateCrew<'a> {
 
 #[derive(Debug, Deserialize, Queryable)]
 pub struct HeatShield {
-  material: Option<String>,
-  size_meters: Option<f64>,
-  temp_degrees: Option<i32>,
-  dev_partner: Option<String>,
+  pub material: Option<String>,
+  pub size_meters: Option<f64>,
+  pub temp_degrees: Option<i32>,
+  pub dev_partner: Option<String>,
 }
 #[derive(Debug, Deserialize, Queryable)]
 pub struct Mass {
@@ -284,7 +284,7 @@ pub struct Dragons {
   pub sidewall_angle_deg: Option<i32>,
   pub orbit_duration_yr: Option<i32>,
   pub dry_mass_kg: Option<i32>,
-  pub dry_mass_lbs: Option<i32>,
+  pub dry_mass_lb: Option<i32>,
   pub thrusters: Vec<Thrusters>,
   pub wikipedia: Option<String>,
   pub description: Option<String>,
@@ -293,7 +293,6 @@ pub struct Dragons {
 #[derive(Insertable, AsChangeset)]
 #[table_name="dragons_heat_shield"]
 pub struct UpdateDragonsHeatShield<'a> {
-  pub id: &'a i32,
   pub dragon_id: &'a String,
   pub material: &'a String,
   pub size_meters: &'a f64,
@@ -304,7 +303,6 @@ pub struct UpdateDragonsHeatShield<'a> {
 #[derive(Insertable, AsChangeset)]
 #[table_name="dragons_pressurized_capsule"]
 pub struct UpdateDragonsPressurizedCapsule<'a> {
-  pub id: &'a i32,
   pub dragon_id: &'a String,
   pub payload_volume_cubic_meters: &'a i32,
   pub payload_volume_cubic_feet: &'a i32,
@@ -313,7 +311,6 @@ pub struct UpdateDragonsPressurizedCapsule<'a> {
 #[derive(Insertable, AsChangeset)]
 #[table_name="dragons_trunk"]
 pub struct UpdateDragonsTrunk<'a> {
-  pub id: &'a i32,
   pub dragon_id: &'a String,
   pub trunk_volume_cubic_meters: &'a i32,
   pub trunk_volume_cubic_feet: &'a i32,
@@ -324,7 +321,7 @@ pub struct UpdateDragonsTrunk<'a> {
 #[derive(Insertable, AsChangeset)]
 #[table_name="dragons_thrusters"]
 pub struct UpdateDragonsThrusters<'a> {
-  pub id: &'a i32,
+  pub id: &'a str,
   pub dragon_id: &'a String,
   pub type_: &'a String,
   pub amount: &'a i32,
