@@ -174,7 +174,6 @@ async fn main() -> io::Result<()> {
     let history = queryspacex::get_history().await;
     match history {
         Ok(info) => {
-            println!("History: {:?}", info);
             for event in info {
                 handle_push_history_to_db(event);
             }
@@ -188,10 +187,94 @@ async fn main() -> io::Result<()> {
         operations::add_history(&conn, &info);
     }
 
+    let landpads = queryspacex::get_landpads().await;
+    match landpads {
+        Ok(info) => {
+            println!("Landpads: {:?}", info);
+            for landpad in info {
+                handle_push_landpad_to_db(landpad);
+            }
+        }
+        Err(e) => {
+            println!("Error getting landpads: {:?}", e);
+        }
+    };
+    fn handle_push_landpad_to_db(info: database::models::Landpads) {
+        let conn = operations::establish_connection();
+        operations::add_landpad(&conn, &info);
+    }
 
+    let launches = queryspacex::get_launches().await;
+    match launches {
+        Ok(info) => {
+            println!("Launches: {:?}", info);
+            for launch in info {
+                handle_push_launch_to_db(launch);
+            }
+        }
+        Err(e) => {
+            println!("Error getting launches: {:?}", e);
+        }
+    };
+    fn handle_push_launch_to_db(launch: database::models::Launches) {
+        let conn = operations::establish_connection();
+        operations::add_launch(&conn, &launch);
+    }
+
+    let launchpads = queryspacex::get_launchpads().await;
+    match launchpads {
+        Ok(info) => {
+            println!("LaunchPads: {:?}", info);
+            for launchpad in info {
+                handle_push_launchpad_to_db(launchpad);
+            }
+        }
+        Err(e) => {
+            println!("Error getting launchpads: {:?}", e);
+        }
+    };
+    fn handle_push_launchpad_to_db(launchpad: database::models::LaunchPads) {
+        let conn = operations::establish_connection();
+        operations::add_launchpad(&conn, &launchpad);
+    }
+
+    let payloads = queryspacex::get_payloads().await;
+    match payloads {
+        Ok(info) => {
+            println!("Payloads: {:?}", info);
+            for payload in info {
+                handle_push_payload_to_db(payload);
+            }
+        }
+        Err(e) => {
+            println!("Error getting payloads: {:?}", e);
+        }
+    };
+    fn handle_push_payload_to_db(payload: database::models::Payloads) {
+        let conn = operations::establish_connection();
+        operations::add_payload(&conn, &payload);
+    }
+
+    let rockets = queryspacex::get_rockets().await;
+    match rockets {
+        Ok(info) => {
+            println!("Rockets: {:?}", info);
+            for rocket in info {
+                handle_push_rocket_to_db(rocket);
+            }
+        }
+        Err(e) => {
+            println!("Error getting rockets: {:?}", e);
+        }
+    };
+    fn handle_push_rocket_to_db(rocket: database::models::Rockets) {
+        let conn = operations::establish_connection();
+        operations::add_rocket(&conn, &rocket);
+    };
 
     HttpServer::new(|| {
         App::new()
+            .app_data(web::PayloadConfig::new(1000000 * 250))
             // cookie session middleware
             .wrap(CookieSession::signed(&[0; 32]).secure(false))
             // enable logger - always register actix-web Logger middleware last

@@ -1,0 +1,27 @@
+CREATE TABLE launches
+(
+  launch_id character varying NOT NULL,
+  name character varying,
+  static_fire_date_utc character varying,
+  static_fire_date_unix Int,
+  tdb Boolean,
+  net Boolean,
+  window_number INT,
+  rocket character varying,
+  success Boolean,
+  details text,
+  crew text[],
+  ships text[],
+  capsules text[],
+  payloads text[],
+  launchpad character varying,
+  auto_update Boolean,
+  flight_number Int,
+  date_utc character varying,
+  date_unix Int,
+  date_local character varying,
+  date_precision character varying,
+  upcoming Boolean,
+  row_updated timestamp with time zone NOT NULL,
+  CONSTRAINT launches_pkey PRIMARY KEY (launch_id)
+)

@@ -341,7 +341,11 @@ pub fn add_history<'a>(conn: &PgConnection, history_details: &'a History) {
     event_date_utc: &history_details.event_date_utc.as_ref().unwrap(),
     event_date_unix: &history_details.event_date_unix.unwrap(),
     details: &history_details.details.as_ref().unwrap(),
-    links_article: &history_details.links.article.clone().unwrap_or("".to_string()),
+    links_article: &history_details
+      .links
+      .article
+      .clone()
+      .unwrap_or("".to_string()),
     row_updated: &now,
   };
 
@@ -352,4 +356,404 @@ pub fn add_history<'a>(conn: &PgConnection, history_details: &'a History) {
     .set(&new_history_entry)
     .execute(conn)
     .expect("Error saving entry into history table");
+}
+
+// Method to push row into database table['landpads']
+pub fn add_landpad<'a>(conn: &PgConnection, landpad_details: &'a Landpads) {
+  let now: DateTime<Utc> = Utc::now();
+
+  let new_landpad_entry = UpdateLandpads {
+    id: &landpad_details.id,
+    name: &landpad_details.name.as_ref().unwrap(),
+    full_name: &landpad_details.full_name.as_ref().unwrap(),
+    status: &landpad_details.status.as_ref().unwrap(),
+    type_: &landpad_details.r#type.as_ref().unwrap(),
+    locality: &landpad_details.locality.as_ref().unwrap(),
+    region: &landpad_details.region.as_ref().unwrap(),
+    latitude: &landpad_details.latitude.unwrap(),
+    longitude: &landpad_details.longitude.unwrap(),
+    landing_attempts: &landpad_details.landing_attempts.unwrap(),
+    landing_successes: &landpad_details.landing_successes.unwrap(),
+    wikipedia: &landpad_details.wikipedia.as_ref().unwrap(),
+    details: &landpad_details.details.as_ref().unwrap(),
+    launches: &landpad_details.launches.as_ref().unwrap(),
+    row_updated: &now,
+  };
+
+  diesel::insert_into(landpads::table)
+    .values(&new_landpad_entry)
+    .on_conflict(landpads::id)
+    .do_update()
+    .set(&new_landpad_entry)
+    .execute(conn)
+    .expect("Error saving entry into landpads table");
+}
+
+
+// Method to push row into database tables['launches', 'launch_fairings', 'launch_links', 'launch_cores', 'launch_links']
+pub fn add_launch<'a>(conn: &PgConnection, launch_details: &'a Launches) {
+  let now: DateTime<Utc> = Utc::now();
+
+  let new_launch_entry = UpdateLaunches {
+    launch_id: &launch_details.id,
+    name: &launch_details.name.as_ref().unwrap(),
+    static_fire_date_utc: &launch_details.static_fire_date_utc.clone().unwrap_or("".to_string()),
+    static_fire_date_unix: &launch_details.static_fire_date_unix.unwrap_or(0),
+    tdb: &launch_details.tdb.unwrap_or(false),
+    net: &launch_details.net.unwrap_or(false),
+    window_number: &launch_details.window.unwrap_or(0),
+    rocket: &launch_details.rocket.as_ref().unwrap(),
+    success: &launch_details.success.unwrap_or(false),
+    details: &launch_details.details.clone().unwrap_or("".to_string()),
+    crew: &launch_details.crew.as_ref().unwrap(),
+    ships: &launch_details.ships.as_ref().unwrap(),
+    capsules: &launch_details.capsules.as_ref().unwrap(),
+    payloads: &launch_details.payloads.as_ref().unwrap(),
+    launchpad: &launch_details.launchpad.as_ref().unwrap(),
+    auto_update: &launch_details.auto_update.unwrap_or(false),
+    flight_number: &launch_details.flight_number.unwrap(),
+    date_utc: &launch_details.date_utc.as_ref().unwrap(),
+    date_unix: &launch_details.date_unix.unwrap(),
+    date_local: &launch_details.date_local.as_ref().unwrap(),
+    date_precision: &launch_details.date_precision.as_ref().unwrap(),
+    upcoming: &launch_details.upcoming.unwrap_or(false),
+    row_updated: &now,
+  };
+  let placeholder_fairing = LaunchFairings {
+    reused: None,
+    recovery_attempt: None,
+    recovered: None,
+    ships: None,
+  };
+  let new_launch_fairing_entry = UpdateLaunchFairings {
+    launch_id: &launch_details.id,
+    reused: &launch_details.fairings.as_ref().unwrap_or(&placeholder_fairing).reused.unwrap_or(false),
+    recovery_attempt: &launch_details.fairings.as_ref().unwrap_or(&placeholder_fairing).recovery_attempt.unwrap_or(false),
+    recovered: &launch_details.fairings.as_ref().unwrap_or(&placeholder_fairing).recovered.unwrap_or(false),
+    ships: &launch_details.fairings.as_ref().unwrap_or(&placeholder_fairing).ships.clone().unwrap_or([].to_vec()),
+    row_updated: &now,
+  };
+  let placeholder_link = LaunchLinks {
+    patch: None,
+    reddit: None,
+    flickr: None,
+    presskit: None,
+    webcast: None,
+    youtube_id: None,
+    article: None,
+    wikipedia: None,
+  };
+  let placeholder_patch = LaunchLinkPatch {
+    small: None,
+    large: None,
+  };
+  let new_launch_links_entry = UpdateLaunchLinks {
+    launch_id: &launch_details.id,
+    patch_small: &launch_details.links.as_ref().unwrap_or(&placeholder_link).patch.as_ref().unwrap_or(&placeholder_patch).small.clone().unwrap_or("".to_string()),
+    patch_large: &launch_details.links.as_ref().unwrap_or(&placeholder_link).patch.as_ref().unwrap_or(&placeholder_patch).large.clone().unwrap_or("".to_string()),
+    reddit_campaign: &launch_details.links.as_ref().unwrap_or(&placeholder_link).reddit.as_ref().unwrap().campaign.clone().unwrap_or("".to_string()),
+    reddit_launch: &launch_details.links.as_ref().unwrap_or(&placeholder_link).reddit.as_ref().unwrap().launch.clone().unwrap_or("".to_string()),
+    reddit_media: &launch_details.links.as_ref().unwrap_or(&placeholder_link).reddit.as_ref().unwrap().media.clone().unwrap_or("".to_string()),
+    reddit_recovery: &launch_details.links.as_ref().unwrap_or(&placeholder_link).reddit.as_ref().unwrap().recovery.clone().unwrap_or("".to_string()),
+    flickr_small: &launch_details.links.as_ref().unwrap_or(&placeholder_link).flickr.as_ref().unwrap().small.as_ref().unwrap(),
+    flickr_original: &launch_details.links.as_ref().unwrap_or(&placeholder_link).flickr.as_ref().unwrap().original.as_ref().unwrap(),
+    presskit: &launch_details.links.as_ref().unwrap_or(&placeholder_link).presskit.clone().unwrap_or("".to_string()),
+    webcast: &launch_details.links.as_ref().unwrap_or(&placeholder_link).webcast.clone().unwrap_or("".to_string()),
+    youtube_id: &launch_details.links.as_ref().unwrap_or(&placeholder_link).youtube_id.clone().unwrap_or("".to_string()),
+    article: &launch_details.links.as_ref().unwrap_or(&placeholder_link).article.clone().unwrap_or("".to_string()),
+    wikipedia: &launch_details.links.as_ref().unwrap_or(&placeholder_link).wikipedia.clone().unwrap_or("".to_string()),
+    row_updated: &now,
+  };
+
+  diesel::insert_into(launches::table)
+    .values(&new_launch_entry)
+    .on_conflict(launches::launch_id)
+    .do_update()
+    .set(&new_launch_entry)
+    .execute(conn)
+    .expect("Error saving entry into launches table");
+
+  diesel::insert_into(launch_fairings::table)
+    .values(&new_launch_fairing_entry)
+    .on_conflict(launch_fairings::launch_id)
+    .do_update()
+    .set(&new_launch_fairing_entry)
+    .execute(conn)
+    .expect("Error saving entry into launch_fairings");
+
+  diesel::insert_into(launch_links::table)
+    .values(&new_launch_links_entry)  
+    .on_conflict(launch_links::launch_id)
+    .do_update()
+    .set(&new_launch_links_entry)
+    .execute(conn)
+    .expect("Error saving entry into launch_links table");
+
+  for (index, failure) in launch_details.failures.as_ref().unwrap().iter().enumerate() {
+    let new_launch_failures_entry = UpdateLaunchFailures {
+      id: &format!("{}{}{}", &launch_details.id, "_", index.to_string()),
+      launch_id: &launch_details.id,
+      time: &failure.time.unwrap(),
+      altitude: &failure.altitude.unwrap_or(0),
+      reason: &failure.reason.as_ref().unwrap(),
+      row_updated: &now,
+    };
+    diesel::insert_into(launch_failures::table)
+      .values(&new_launch_failures_entry)
+      .on_conflict(launch_failures::id)
+      .do_update()
+      .set(&new_launch_failures_entry)
+      .execute(conn)
+      .expect("Error saving entry into launch_failures table");
+  };
+
+  for (index, core) in launch_details.cores.as_ref().unwrap().iter().enumerate() {
+    let new_launch_core_entry = UpdateLaunchCores {
+      id: &format!("{}{}{}", &launch_details.id, "_", index.to_string()),
+      launch_id: &launch_details.id,
+      core: &core.core.clone().unwrap_or("".to_string()),
+      flight: &core.flight.unwrap_or(0),
+      gridfins: &core.gridfins.unwrap_or(false),
+      legs: &core.legs.unwrap_or(false),
+      reused: &core.reused.unwrap_or(false),
+      landing_attempt: &core.landing_attempt.unwrap_or(false),
+      landing_success: &core.landing_success.unwrap_or(false),
+      landing_type: &core.landing_type.clone().unwrap_or("".to_string()),
+      landpad: &core.landpad.clone().unwrap_or("".to_string()),
+      row_updated: &now,
+    };
+    diesel::insert_into(launch_cores::table)
+      .values(&new_launch_core_entry)
+      .on_conflict(launch_cores::id)
+      .do_update()
+      .set(&new_launch_core_entry)
+      .execute(conn)
+      .expect("Error saving entry into launch_cores table");
+  };
+}
+
+
+// Method to push row into database table['launchpads']
+pub fn add_launchpad<'a>(conn: &PgConnection, launchpad_details: &'a LaunchPads) {
+  let now: DateTime<Utc> = Utc::now();
+
+  let new_launchpad_entry = UpdateLaunchpads {
+    id: &launchpad_details.id,
+    name: &launchpad_details.name.as_ref().unwrap(),
+    full_name: &launchpad_details.full_name.as_ref().unwrap(),
+    locality: &launchpad_details.locality.as_ref().unwrap(),
+    region: &launchpad_details.region.as_ref().unwrap(),
+    timezone: &launchpad_details.timezone.as_ref().unwrap(),
+    latitude: &launchpad_details.latitude.unwrap(),
+    longitude: &launchpad_details.longitude.unwrap(),
+    launch_attempts: &launchpad_details.launch_attempts.unwrap(),
+    launch_successes: &launchpad_details.launch_successes.unwrap(),
+    rockets: &launchpad_details.rockets.as_ref().unwrap(),
+    launches: &launchpad_details.launches.as_ref().unwrap(),
+    status: &launchpad_details.status.as_ref().unwrap(),
+    row_updated: &now,
+  };
+
+  diesel::insert_into(launchpads::table)
+    .values(&new_launchpad_entry)
+    .on_conflict(launchpads::id)
+    .do_update()
+    .set(&new_launchpad_entry)
+    .execute(conn)
+    .expect("Error saving entry into launchpads table");
+}
+
+
+// Method to push row into database table['payloads']
+pub fn add_payload<'a>(conn: &PgConnection, payload_details: &'a Payloads) {
+  let now: DateTime<Utc> = Utc::now();
+
+  let new_payload_entry = UpdatePayloads {
+    payload_id: &payload_details.id,
+    name: &payload_details.name.as_ref().unwrap(),
+    type_: &payload_details.r#type.as_ref().unwrap(),
+    reused: &payload_details.reused.as_ref().unwrap(),
+    launch: &payload_details.launch.as_ref().unwrap(),
+    customers: &payload_details.customers.as_ref().unwrap(),
+    norad_ids: &payload_details.norad_ids.as_ref().unwrap(),
+    nationalities: &payload_details.nationalities.as_ref().unwrap(),
+    manufacturers: &payload_details.manufacturers.as_ref().unwrap(),
+    mass_kg: &payload_details.mass_kg.unwrap_or(0.0),
+    mass_lbs: &payload_details.mass_lbs.unwrap_or(0.0),
+    orbit: &payload_details.orbit.clone().unwrap_or("".to_string()),
+    reference_system: &payload_details.reference_system.clone().unwrap_or("".to_string()),
+    regime: &payload_details.regime.clone().unwrap_or("".to_string()),
+    longitude: &payload_details.longitude.unwrap_or(0.0),
+    semi_major_axis_km: &payload_details.semi_major_axis_km.unwrap_or(0.0),
+    eccentricity: &payload_details.eccentricity.unwrap_or(0.0),
+    periapsis_km: &payload_details.periapsis_km.unwrap_or(0.0),
+    apoapsis_km: &payload_details.apoapsis_km.unwrap_or(0.0),
+    inclination_deg: &payload_details.inclination_deg.unwrap_or(0.0),
+    period_min: &payload_details.period_min.unwrap_or(0.0),
+    lifespan_years: &payload_details.lifespan_years.unwrap_or(0.0),
+    epoch: &payload_details.epoch.clone().unwrap_or("".to_string()),
+    mean_motion: &payload_details.mean_motion.unwrap_or(0.0),
+    raan: &payload_details.raan.unwrap_or(0.0),
+    arg_of_pericenter: &payload_details.arg_of_pericenter.unwrap_or(0.0),
+    mean_anomaly: &payload_details.mean_anomaly.unwrap_or(0.0),
+    row_updated: &now,
+  };
+  let new_payload_dragon_entry = UpdatePayloadDragon {
+    payload_id: &payload_details.id,
+    capsule: &payload_details.dragon.capsule.clone().unwrap_or("".to_string()),
+    mass_returned_kg: &payload_details.dragon.mass_returned_kg.unwrap_or(0.0),
+    mass_returned_lbs: &payload_details.dragon.mass_returned_lbs.unwrap_or(0.0),
+    flight_time_sec: &payload_details.dragon.flight_time_sec.unwrap_or(0),
+    manifest: &payload_details.dragon.manifest.clone().unwrap_or("".to_string()),
+    water_landing: &payload_details.dragon.water_landing.clone().unwrap_or(false),
+    land_landing: &payload_details.dragon.land_landing.clone().unwrap_or(false),
+    row_updated: &now,
+  };
+  
+
+  diesel::insert_into(payloads::table)
+    .values(&new_payload_entry)
+    .on_conflict(payloads::payload_id)
+    .do_update()
+    .set(&new_payload_entry)
+    .execute(conn)
+    .expect("Error saving entry into payloads table");
+
+  diesel::insert_into(payload_dragon::table)
+  .values(&new_payload_dragon_entry)
+  .on_conflict(payload_dragon::payload_id)
+  .do_update()
+  .set(&new_payload_dragon_entry)
+  .execute(conn)
+  .expect("Error saving entry into payload_dragon table");
+}
+
+
+// Method to push row into database tables['rockets', 'rocket_first_stage', 'rocket_second_stage', 'rocket_engine', 'rocket_payload_weights']
+pub fn add_rocket<'a>(conn: &PgConnection, rocket_details: &'a Rockets) {
+  let now: DateTime<Utc> = Utc::now();
+
+  let new_rocket_entry = UpdateRockets {
+    rocket_id: &rocket_details.id,
+    name: &rocket_details.name.clone().unwrap_or("".to_string()),
+    type_: &rocket_details.r#type.clone().unwrap_or("".to_string()),
+    active: &rocket_details.active.unwrap_or(false),
+    stages: &rocket_details.stages.unwrap_or(0),
+    boosters: &rocket_details.boosters.unwrap_or(0),
+    cost_per_launch: &rocket_details.cost_per_launch.unwrap_or(0),
+    success_rate_pct: &rocket_details.success_rate_pct.unwrap_or(0),
+    first_flight: &rocket_details.first_flight.clone().unwrap_or("".to_string()),
+    country: &rocket_details.country.clone().unwrap_or("".to_string()),
+    company: &rocket_details.company.clone().unwrap_or("".to_string()),
+    wikipedia: &rocket_details.wikipedia.clone().unwrap_or("".to_string()),
+    description: &rocket_details.description.clone().unwrap_or("".to_string()),
+    height_meters: &rocket_details.height.meters.unwrap_or(0.0),
+    height_feet: &rocket_details.height.feet.unwrap_or(0.0),
+    diameter_meters: &rocket_details.diameter.meters.unwrap_or(0.0),
+    diameter_feet: &rocket_details.diameter.feet.unwrap_or(0.0),
+    mass_kg: &rocket_details.mass.kg.unwrap_or(0),
+    mass_lbs: &rocket_details.mass.lb.unwrap_or(0),
+    landing_legs_number: &rocket_details.landing_legs.number.unwrap_or(0),
+    landing_legs_material: &rocket_details.landing_legs.material.clone().unwrap_or("".to_string()),
+    flickr_images: &rocket_details.flickr_images.as_ref().unwrap(),
+    row_updated: &now,
+  };
+  let new_rocket_first_stage_entry = UpdateRocketFirstStage {
+    rocket_id: &rocket_details.id,
+    thrust_sea_level_kn: &rocket_details.first_stage.thrust_sea_level.kN.unwrap_or(0.0),
+    thrust_sea_level_lbf: &rocket_details.first_stage.thrust_sea_level.lbf.unwrap_or(0.0),
+    thrust_vacuum_kn: &rocket_details.first_stage.thrust_vacuum.kN.unwrap_or(0.0),
+    thrust_vacuum_lbf: &rocket_details.first_stage.thrust_vacuum.lbf.unwrap_or(0.0),
+    reusable: &rocket_details.first_stage.reusable.unwrap_or(false),
+    engines: &rocket_details.first_stage.engines.unwrap_or(0),
+    fuel_amount_tons: &rocket_details.first_stage.fuel_amount_tons.unwrap_or(0.0),
+    burn_time_sec: &rocket_details.first_stage.burn_time_sec.unwrap_or(0),
+    row_updated: &now,
+  };
+  let new_rocket_second_stage_entry = UpdateRocketSecondStage {
+    rocket_id: &rocket_details.id,
+    thrust_kn: &rocket_details.second_stage.thrust.kN.unwrap_or(0.0),
+    thrust_lbf: &rocket_details.second_stage.thrust.lbf.unwrap_or(0.0),
+    payloads_composite_fairing_height_meters: &rocket_details.second_stage.payloads.composite_fairing.height.meters.unwrap_or(0.0),
+    payloads_composite_fairing_height_feet: &rocket_details.second_stage.payloads.composite_fairing.height.feet.unwrap_or(0.0),
+    payloads_composite_fairing_diameter_meters: &rocket_details.second_stage.payloads.composite_fairing.diameter.meters.unwrap_or(0.0),
+    payloads_composite_fairing_diameter_feet: &rocket_details.second_stage.payloads.composite_fairing.diameter.feet.unwrap_or(0.0),
+    payloads_option_1: &rocket_details.second_stage.payloads.option_1.clone().unwrap_or("".to_string()),
+    reusable: &rocket_details.second_stage.reusable.unwrap_or(false),
+    engines: &rocket_details.second_stage.engines.unwrap_or(0),
+    fuel_amount_tons: &rocket_details.second_stage.fuel_amount_tons.unwrap_or(0.0),
+    burn_time_sec: &rocket_details.second_stage.burn_time_sec.unwrap_or(0),
+    row_updated: &now,
+  };
+  let new_rocket_engine_entry = UpdateRocketEngine {
+    rocket_id: &rocket_details.id,
+    isp_sea_level: &rocket_details.engines.isp.sea_level.unwrap_or(0),
+    isp_vacuum: &rocket_details.engines.isp.vacuum.unwrap_or(0),
+    thrust_sea_level_kn: &rocket_details.engines.thrust_sea_level.kN.unwrap_or(0.0),
+    thrust_sea_level_lbf: &rocket_details.engines.thrust_sea_level.lbf.unwrap_or(0.0),
+    thrust_vacuum_kn: &rocket_details.engines.thrust_vacuum.kN.unwrap_or(0.0),
+    thrust_vacuum_lbf: &rocket_details.engines.thrust_vacuum.lbf.unwrap_or(0.0),
+    number: &rocket_details.engines.number.unwrap_or(0),
+    type_: &rocket_details.engines.r#type.clone().unwrap_or("".to_string()),
+    version: &rocket_details.engines.version.clone().unwrap_or("".to_string()),
+    layout: &rocket_details.engines.layout.clone().unwrap_or("".to_string()),
+    engine_loss_max: &rocket_details.engines.engine_loss_max.unwrap_or(0),
+    propellant_1: &rocket_details.engines.propellant_1.clone().unwrap_or("".to_string()),
+    propellant_2: &rocket_details.engines.propellant_2.clone().unwrap_or("".to_string()),
+    thrust_to_weight: &rocket_details.engines.thrust_to_weight.unwrap_or(0.0),
+    row_updated: &now,
+  };
+
+  diesel::insert_into(rockets::table)
+  .values(&new_rocket_entry)
+  .on_conflict(rockets::rocket_id)
+  .do_update()
+  .set(&new_rocket_entry)
+  .execute(conn)
+  .expect("Error saving entry into rockets table");
+
+  diesel::insert_into(rocket_first_stage::table)
+  .values(&new_rocket_first_stage_entry)
+  .on_conflict(rocket_first_stage::rocket_id)
+  .do_update()
+  .set(&new_rocket_first_stage_entry)
+  .execute(conn)
+  .expect("Error saving entry into rocket_first_stage table");
+
+  diesel::insert_into(rocket_second_stage::table)
+  .values(&new_rocket_second_stage_entry)
+  .on_conflict(rocket_second_stage::rocket_id)
+  .do_update()
+  .set(&new_rocket_second_stage_entry)
+  .execute(conn)
+  .expect("Error saving entry into rocket_second_stage table");
+
+  diesel::insert_into(rocket_engine::table)
+    .values(&new_rocket_engine_entry)
+    .on_conflict(rocket_engine::rocket_id)
+    .do_update()
+    .set(&new_rocket_engine_entry)
+    .execute(conn)
+    .expect("Error saving entry into rocket_engine table");
+
+    for (index, pw) in rocket_details.payload_weights.iter().enumerate() {
+      let new_rocket_payload_weight_entry = UpdateRocketPayloadWeight {
+        id: &format!("{}{}{}", &rocket_details.id, "_", index.to_string()),
+        rocket_id: &rocket_details.id,
+        payload_id: &pw.id.as_ref().unwrap(),
+        name: &pw.name.as_ref().unwrap(),
+        kg: &pw.kg.unwrap(),
+        lb: &pw.lb.unwrap(),
+        row_updated: &now,
+      };
+      
+      diesel::insert_into(rocket_payload_weights::table)
+        .values(&new_rocket_payload_weight_entry)
+        .on_conflict(rocket_payload_weights::id)
+        .do_update()
+        .set(&new_rocket_payload_weight_entry)
+        .execute(conn)
+        .expect("Error saving entry into rocket_payload_weights table");
+    };
+
 }

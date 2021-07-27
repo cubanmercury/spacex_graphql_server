@@ -1,0 +1,1 @@
+DROP TABLE rocket_second_stage

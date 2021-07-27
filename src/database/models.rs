@@ -389,3 +389,509 @@ pub struct UpdateHistory<'a> {
   pub links_article: &'a String,
   pub row_updated: &'a DateTime<Utc>,
 }
+
+
+#[derive(Debug, Deserialize, Queryable)]
+pub struct Landpads {
+  pub id: String,
+  pub name: Option<String>,
+  pub full_name: Option<String>,
+  pub status: Option<String>,
+  pub r#type: Option<String>,
+  pub locality: Option<String>,
+  pub region: Option<String>,
+  pub latitude: Option<f64>,
+  pub longitude: Option<f64>,
+  pub landing_attempts: Option<i32>,
+  pub landing_successes: Option<i32>,
+  pub wikipedia: Option<String>,
+  pub details: Option<String>,
+  pub launches: Option<Vec<String>>,
+}
+
+#[derive(Insertable, AsChangeset)]
+#[table_name="landpads"]
+pub struct UpdateLandpads<'a> {
+  pub id: &'a str,
+  pub name: &'a String,
+  pub full_name: &'a String,
+  pub status: &'a String,
+  pub type_: &'a String,
+  pub locality: &'a String,
+  pub region: &'a String,
+  pub latitude: &'a f64,
+  pub longitude: &'a f64,
+  pub landing_attempts: &'a i32,
+  pub landing_successes: &'a i32,
+  pub wikipedia: &'a String,
+  pub details: &'a String,
+  pub launches: &'a Vec<String>,
+  pub row_updated: &'a DateTime<Utc>,
+}
+
+#[derive(Debug, Deserialize, Queryable)]
+pub struct LaunchFairings {
+  pub reused: Option<bool>,
+  pub recovery_attempt: Option<bool>,
+  pub recovered: Option<bool>,
+  pub ships: Option<Vec<String>>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct LaunchLinkPatch {
+  pub small: Option<String>,
+  pub large: Option<String>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct LaunchLinkReddit {
+  pub campaign: Option<String>,
+  pub launch: Option<String>,
+  pub media: Option<String>,
+  pub recovery: Option<String>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct LaunchLinkFlickr {
+  pub small: Option<Vec<String>>,
+  pub original: Option<Vec<String>>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct LaunchLinks {
+  pub patch: Option<LaunchLinkPatch>,
+  pub reddit: Option<LaunchLinkReddit>,
+  pub flickr: Option<LaunchLinkFlickr>,
+  pub presskit: Option<String>,
+  pub webcast: Option<String>,
+  pub youtube_id: Option<String>,
+  pub article: Option<String>,
+  pub wikipedia: Option<String>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct LaunchCores {
+  pub core: Option<String>,
+  pub flight: Option<i32>,
+  pub gridfins: Option<bool>,
+  pub legs: Option<bool>,
+  pub reused: Option<bool>,
+  pub landing_attempt: Option<bool>,
+  pub landing_success: Option<bool>,
+  pub landing_type: Option<String>,
+  pub landpad: Option<String>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct LaunchFailures {
+  pub time: Option<i32>,
+  pub altitude: Option<i32>,
+  pub reason: Option<String>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct Launches {
+  pub id: String,
+  pub name: Option<String>,
+  pub fairings: Option<LaunchFairings>,
+  pub links: Option<LaunchLinks>,
+  pub static_fire_date_utc: Option<String>,
+  pub static_fire_date_unix: Option<i32>,
+  pub tdb: Option<bool>,
+  pub net: Option<bool>,
+  pub window: Option<i32>,
+  pub rocket: Option<String>,
+  pub success: Option<bool>,
+  pub failures: Option<Vec<LaunchFailures>>,
+  pub details: Option<String>,
+  pub crew: Option<Vec<String>>,
+  pub ships: Option<Vec<String>>,
+  pub capsules: Option<Vec<String>>,
+  pub payloads: Option<Vec<String>>,
+  pub launchpad: Option<String>,
+  pub auto_update: Option<bool>,
+  pub flight_number: Option<i32>,
+  pub date_utc: Option<String>,
+  pub date_unix: Option<i32>,
+  pub date_local: Option<String>,
+  pub date_precision: Option<String>,
+  pub upcoming: Option<bool>,
+  pub cores: Option<Vec<LaunchCores>>,
+}
+
+#[derive(Insertable, AsChangeset)]
+#[table_name="launches"]
+pub struct UpdateLaunches<'a> {
+  pub launch_id: &'a str,
+  pub name: &'a String,
+  pub static_fire_date_utc: &'a String,
+  pub static_fire_date_unix: &'a i32,
+  pub tdb: &'a bool,
+  pub net: &'a bool,
+  pub window_number: &'a i32,
+  pub rocket: &'a String,
+  pub success: &'a bool,
+  pub details: &'a String,
+  pub crew: &'a Vec<String>,
+  pub ships: &'a Vec<String>,
+  pub capsules: &'a Vec<String>,
+  pub payloads: &'a Vec<String>,
+  pub launchpad: &'a String,
+  pub auto_update: &'a bool,
+  pub flight_number: &'a i32,
+  pub date_utc: &'a String,
+  pub date_unix: &'a i32,
+  pub date_local: &'a String,
+  pub date_precision: &'a String,
+  pub upcoming: &'a bool,
+  pub row_updated: &'a DateTime<Utc>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="launch_fairings"]
+pub struct UpdateLaunchFairings<'a> {
+  pub launch_id: &'a str,
+  pub reused: &'a bool,
+  pub recovery_attempt: &'a bool,
+  pub recovered: &'a bool,
+  pub ships: &'a Vec<String>,
+  pub row_updated: &'a DateTime<Utc>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="launch_links"]
+pub struct UpdateLaunchLinks<'a> {
+  pub launch_id: &'a str,
+  pub patch_small: &'a String,
+  pub patch_large: &'a String,
+  pub reddit_campaign: &'a String,
+  pub reddit_launch: &'a String,
+  pub reddit_media: &'a String,
+  pub reddit_recovery: &'a String,
+  pub flickr_small: &'a Vec<String>,
+  pub flickr_original: &'a Vec<String>,
+  pub presskit: &'a String,
+  pub webcast: &'a String,
+  pub youtube_id: &'a String,
+  pub article: &'a String,
+  pub wikipedia: &'a String,
+  pub row_updated: &'a DateTime<Utc>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="launch_cores"]
+pub struct UpdateLaunchCores<'a> {
+  pub id: &'a str,
+  pub launch_id: &'a str,
+  pub core: &'a String,
+  pub flight: &'a i32,
+  pub gridfins: &'a bool,
+  pub legs: &'a bool,
+  pub reused: &'a bool,
+  pub landing_attempt: &'a bool,
+  pub landing_success: &'a bool,
+  pub landing_type: &'a String,
+  pub landpad: &'a String,
+  pub row_updated: &'a DateTime<Utc>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="launch_failures"]
+pub struct UpdateLaunchFailures<'a> {
+  pub id: &'a str,
+  pub launch_id: &'a str,
+  pub time: &'a i32,
+  pub altitude: &'a i32,
+  pub reason: &'a String,
+  pub row_updated: &'a DateTime<Utc>,
+}
+
+
+#[derive(Debug, Deserialize, Queryable)]
+pub struct LaunchPads {
+  pub id: String,
+  pub name: Option<String>,
+  pub full_name: Option<String>,
+  pub locality: Option<String>,
+  pub region: Option<String>,
+  pub timezone: Option<String>,
+  pub latitude: Option<f64>,
+  pub longitude: Option<f64>,
+  pub launch_attempts: Option<i32>,
+  pub launch_successes: Option<i32>,
+  pub rockets: Option<Vec<String>>,
+  pub launches: Option<Vec<String>>,
+  pub status: Option<String>,
+}
+
+#[derive(Insertable, AsChangeset)]
+#[table_name="launchpads"]
+pub struct UpdateLaunchpads<'a> {
+  pub id: &'a str,
+  pub name: &'a String,
+  pub full_name: &'a String,
+  pub locality: &'a String,
+  pub region: &'a String,
+  pub timezone: &'a String,
+  pub latitude: &'a f64,
+  pub longitude: &'a f64,
+  pub launch_attempts: &'a i32,
+  pub launch_successes: &'a i32,
+  pub rockets: &'a Vec<String>,
+  pub launches: &'a Vec<String>,
+  pub status: &'a String,
+  pub row_updated: &'a DateTime<Utc>,
+}
+
+
+#[derive(Debug, Deserialize, Queryable)]
+pub struct PayloadDragon {
+  pub capsule: Option<String>,
+  pub mass_returned_kg: Option<f64>,
+  pub mass_returned_lbs: Option<f64>,
+  pub flight_time_sec: Option<i64>,
+  pub manifest: Option<String>,
+  pub water_landing: Option<bool>,
+  pub land_landing: Option<bool>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct Payloads {
+  pub id: String,
+  pub name: Option<String>,
+  pub r#type: Option<String>,
+  pub dragon: PayloadDragon,
+  pub reused: Option<bool>,
+  pub launch: Option<String>,
+  pub customers: Option<Vec<String>>,
+  pub norad_ids: Option<Vec<i32>>,
+  pub nationalities: Option<Vec<String>>,
+  pub manufacturers: Option<Vec<String>>,
+  pub mass_kg: Option<f64>,
+  pub mass_lbs: Option<f64>,
+  pub orbit: Option<String>,
+  pub reference_system: Option<String>,
+  pub regime: Option<String>,
+  pub longitude: Option<f64>,
+  pub semi_major_axis_km: Option<f64>,
+  pub eccentricity: Option<f64>,
+  pub periapsis_km: Option<f64>,
+  pub apoapsis_km: Option<f64>,
+  pub inclination_deg: Option<f64>,
+  pub period_min: Option<f64>,
+  pub lifespan_years: Option<f64>,
+  pub epoch: Option<String>,
+  pub mean_motion: Option<f64>,
+  pub raan: Option<f64>,
+  pub arg_of_pericenter: Option<f64>,
+  pub mean_anomaly: Option<f64>,
+}
+
+#[derive(Insertable, AsChangeset)]
+#[table_name="payloads"]
+pub struct UpdatePayloads<'a> {
+  pub payload_id: &'a str,
+  pub name: &'a String,
+  pub type_: &'a String,
+  pub reused: &'a bool,
+  pub launch: &'a String,
+  pub customers: &'a Vec<String>,
+  pub norad_ids: &'a Vec<i32>,
+  pub nationalities: &'a Vec<String>,
+  pub manufacturers: &'a Vec<String>,
+  pub mass_kg: &'a f64,
+  pub mass_lbs: &'a f64,
+  pub orbit: &'a String,
+  pub reference_system: &'a String,
+  pub regime: &'a String,
+  pub longitude: &'a f64,
+  pub semi_major_axis_km: &'a f64,
+  pub eccentricity: &'a f64,
+  pub periapsis_km: &'a f64,
+  pub apoapsis_km: &'a f64,
+  pub inclination_deg: &'a f64,
+  pub period_min: &'a f64,
+  pub lifespan_years: &'a f64,
+  pub epoch: &'a String,
+  pub mean_motion: &'a f64,
+  pub raan: &'a f64,
+  pub arg_of_pericenter: &'a f64,
+  pub mean_anomaly: &'a f64,
+  pub row_updated: &'a DateTime<Utc>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="payload_dragon"]
+pub struct UpdatePayloadDragon<'a> {
+  pub payload_id: &'a str,
+  pub capsule: &'a String,
+  pub mass_returned_kg: &'a f64,
+  pub mass_returned_lbs: &'a f64,
+  pub flight_time_sec: &'a i64,
+  pub manifest: &'a String,
+  pub water_landing: &'a bool,
+  pub land_landing: &'a bool,
+  pub row_updated: &'a DateTime<Utc>,
+}
+
+
+#[derive(Debug, Deserialize, Queryable)]
+pub struct RocketFirstStage {
+  pub thrust_sea_level: Thrust,
+  pub thrust_vacuum: Thrust,
+  pub reusable: Option<bool>,
+  pub engines: Option<i32>,
+  pub fuel_amount_tons: Option<f64>,
+  pub burn_time_sec: Option<i32>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct RocketSecondStage {
+  pub thrust: Thrust,
+  pub payloads: RocketSecondStagePayloads,
+  pub reusable: Option<bool>,
+  pub engines: Option<i32>,
+  pub fuel_amount_tons: Option<f64>,
+  pub burn_time_sec: Option<i32>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct RocketSecondStagePayloadsFairing {
+  pub height: Distance,
+  pub diameter: Distance,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct RocketSecondStagePayloads {
+  pub composite_fairing: RocketSecondStagePayloadsFairing,
+  pub option_1: Option<String>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct RocketEngineIsp {
+  pub sea_level: Option<i32>,
+  pub vacuum: Option<i32>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct RocketEngine {
+  pub isp: RocketEngineIsp,
+  pub thrust_sea_level: Thrust,
+  pub thrust_vacuum: Thrust,
+  pub number: Option<i32>,
+  pub r#type: Option<String>,
+  pub version: Option<String>,
+  pub layout: Option<String>,
+  pub engine_loss_max: Option<i32>,
+  pub propellant_1: Option<String>,
+  pub propellant_2: Option<String>,
+  pub thrust_to_weight: Option<f64>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct RocketLandingLegs {
+  pub number: Option<i32>,
+  pub material: Option<String>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct RocketPayloadWeights {
+  pub id: Option<String>,
+  pub name: Option<String>,
+  pub kg: Option<i32>,
+  pub lb: Option<i32>,
+}
+#[derive(Debug, Deserialize, Queryable)]
+pub struct Rockets {
+  pub id: String,
+  pub name: Option<String>,
+  pub r#type: Option<String>,
+  pub active: Option<bool>,
+  pub stages: Option<i32>,
+  pub boosters: Option<i32>,
+  pub cost_per_launch: Option<i64>,
+  pub success_rate_pct: Option<i32>,
+  pub first_flight: Option<String>,
+  pub country: Option<String>,
+  pub company: Option<String>,
+  pub wikipedia: Option<String>,
+  pub description: Option<String>,
+  pub height: Distance,
+  pub diameter: Distance,
+  pub mass: Mass,
+  pub first_stage: RocketFirstStage,
+  pub second_stage: RocketSecondStage,
+  pub engines: RocketEngine,
+  pub landing_legs: RocketLandingLegs,
+  pub payload_weights: Vec<RocketPayloadWeights>,
+  pub flickr_images: Option<Vec<String>>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="rocket_payload_weights"]
+pub struct UpdateRocketPayloadWeight<'a> {
+  pub id: &'a str,
+  pub rocket_id: &'a str,
+  pub payload_id: &'a String,
+  pub name: &'a String,
+  pub kg: &'a i32,
+  pub lb: &'a i32,
+  pub row_updated: &'a DateTime<Utc>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="rocket_engine"]
+pub struct UpdateRocketEngine<'a> {
+  pub rocket_id: &'a str,
+  pub isp_sea_level: &'a i32,
+  pub isp_vacuum: &'a i32,
+  pub thrust_sea_level_kn: &'a f64,
+  pub thrust_sea_level_lbf: &'a f64,
+  pub thrust_vacuum_kn: &'a f64,
+  pub thrust_vacuum_lbf: &'a f64,
+  pub number: &'a i32,
+  pub type_: &'a String,
+  pub version: &'a String,
+  pub layout: &'a String,
+  pub engine_loss_max: &'a i32,
+  pub propellant_1: &'a String,
+  pub propellant_2: &'a String,
+  pub thrust_to_weight: &'a f64,
+  pub row_updated: &'a DateTime<Utc>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="rocket_second_stage"]
+pub struct UpdateRocketSecondStage<'a> {
+  pub rocket_id: &'a str,
+  pub thrust_kn: &'a f64,
+  pub thrust_lbf: &'a f64,
+  pub payloads_composite_fairing_height_meters: &'a f64,
+  pub payloads_composite_fairing_height_feet: &'a f64,
+  pub payloads_composite_fairing_diameter_meters: &'a f64,
+  pub payloads_composite_fairing_diameter_feet: &'a f64,
+  pub payloads_option_1: &'a String,
+  pub reusable: &'a bool,
+  pub engines: &'a i32,
+  pub fuel_amount_tons: &'a f64,
+  pub burn_time_sec: &'a i32,
+  pub row_updated: &'a DateTime<Utc>,
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="rocket_first_stage"]
+pub struct UpdateRocketFirstStage<'a> {
+  pub rocket_id: &'a str,
+  pub thrust_sea_level_kn: &'a f64, 
+  pub thrust_sea_level_lbf: &'a f64, 
+  pub thrust_vacuum_kn: &'a f64, 
+  pub thrust_vacuum_lbf: &'a f64, 
+  pub reusable: &'a bool, 
+  pub engines: &'a i32, 
+  pub fuel_amount_tons: &'a f64, 
+  pub burn_time_sec: &'a i32, 
+  pub row_updated: &'a DateTime<Utc>, 
+}
+#[derive(Insertable, AsChangeset)]
+#[table_name="rockets"]
+pub struct UpdateRockets<'a> {
+  pub rocket_id: &'a str,
+  pub name: &'a String,
+  pub type_: &'a String,
+  pub active: &'a bool,
+  pub stages: &'a i32,
+  pub boosters: &'a i32,
+  pub cost_per_launch: &'a i64,
+  pub success_rate_pct: &'a i32,
+  pub first_flight: &'a String,
+  pub country: &'a String,
+  pub company: &'a String,
+  pub wikipedia: &'a String,
+  pub description: &'a String,
+  pub height_meters: &'a f64,
+  pub height_feet: &'a f64,
+  pub diameter_meters: &'a f64,
+  pub diameter_feet: &'a f64,
+  pub mass_kg: &'a i32,
+  pub mass_lbs: &'a i32,
+  pub landing_legs_number: &'a i32,
+  pub landing_legs_material: &'a String,
+  pub flickr_images: &'a Vec<String>,
+  pub row_updated: &'a DateTime<Utc>,
+}

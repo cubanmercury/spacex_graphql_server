@@ -3,7 +3,7 @@ use actix_web::dev::Payload;
 use awc::error::SendRequestError;
 use awc::Client;
 use awc::ClientResponse;
-use serde_derive::Deserialize;
+// use serde_derive::Deserialize;
 
 use crate::database::models::Company;
 use crate::database::models::Roadster;
@@ -36,130 +36,6 @@ pub async fn get_client(
     });
 
     return client_resp;
-}
-
-pub async fn get_launches() {
-    let client = Client::default();
-
-    let response = client
-        .get("https://api.spacexdata.com/v4/roadster")
-        .header("User-Agent", "actix-web/3.0")
-        .send()
-        .await;
-
-    // match response.status() {
-    //   StatusCode::Ok => {
-    //     println!("status success");
-    //     let k = response.body().await.unwrap();
-    //     println!("unwrapped body: {:?}", &k);
-    //   }
-    //   _ => println!("status failed")
-    // }
-
-    let r = response.and_then(|resp| {
-        println!("Resp: {:?}", resp);
-        // resp.json().and_then(move |bytes| {
-        //   let s = std::str::from_utf8(&bytes).expect("utf8 parse error");
-        //   println!("html: {:?}", s);
-        // });
-        // println!("body: {:?}", resp.json());
-
-        // resp.json().and_then(move |j| {
-        //    match j {
-        //      Ok(body) => body
-        //    }
-        // });
-
-        // let b = match r {
-        //     JsonBody => println!("JSONBody:" ),
-        //     // JsonBody::JsonPayloadError(Error) => {
-        //     //   panic!("response json body not found: {:?}", Error)
-        //     // }
-        //     _ => println!("it was some other shit, who knows")
-        // };
-
-        // println!("body: {:?}", b);
-
-        match resp.status().as_u16() {
-            200 => println!("resp works"),
-            301 => println!("resp redirects"),
-            404 => println!("resp not found"),
-            _ => println!("resp has unknown status code"),
-        };
-
-        match resp.status().is_success() {
-            true => println!("resp is successful"),
-            false => println!("resp is unsuccessful"),
-        };
-        match resp.status().is_redirection() {
-            true => println!("resp is a redirect"),
-            false => println!("resp is not a redirect"),
-        };
-
-        // resp.body().map_err(|_| ()).and_then(|bytes| {
-        //     println!("{:?}", bytes);
-        //     Ok(())
-        // });
-
-        // match body {
-        //     awc::MessageBody => println!("message body matched"),
-        //     _ => println!("message body not matched")
-        // };
-
-        Ok(resp)
-    });
-
-    // let n = match r {
-    //     Ok(resp) => println!("resp matched: {:?}", resp),
-    //     Err(e) => println!("resp match error: {:?}", e)
-    // };
-
-    #[derive(Deserialize, Debug)]
-    pub struct Roadster {
-        flickr_images: [String; 4],
-        name: String,
-        launch_date_utc: String,
-        launch_date_unix: u32,
-        launch_mass_kg: u32,
-        launch_mass_lbs: u32,
-        norad_id: u32,
-        epoch_jd: f64,
-        orbit_type: String,
-        apoapsis_au: f64,
-        periapsis_au: f64,
-        semi_major_axis_au: f64,
-        eccentricity: f64,
-        inclination: f64,
-        longitude: f64,
-        periapsis_arg: f64,
-        period_days: f64,
-        speed_kph: f64,
-        speed_mph: f64,
-        earth_distance_km: f64,
-        earth_distance_mi: f64,
-        mars_distance_km: f64,
-        mars_distance_mi: f64,
-        wikipedia: String,
-        video: String,
-        details: String,
-        id: String,
-    }
-
-    match r.expect("Error here").json::<Roadster>().await {
-        Ok(v) => println!("k: {:?}", v),
-        Err(e) => println!("k not found: {:?}", e),
-    }
-    // match r.expect("Error deserialising json response").json::<serde_json::Value>().await {
-    //     Ok(v) => println!("k: {:?}", v),
-    //     Err(e) => println!("k not found: {:?}", e)
-    // }
-
-    // k.body().and_then(|bytes| {
-    //     println!("bytes of body: {:?} ", bytes);
-    //     Ok(())
-    // });
-
-    // println!("Response here: {:?}", response);
 }
 
 // Query SpaceX_API for roadster_info
@@ -318,4 +194,116 @@ pub async fn get_history() -> Result<Vec<History>, actix_web::client::JsonPayloa
     };
 
     return history;
+}
+
+// Query SpaceX_API for Landing Pads info
+pub async fn get_landpads() -> Result<Vec<Landpads>, actix_web::client::JsonPayloadError> {
+    let endpoint = String::from("https://api.spacexdata.com/v4/landpads");
+    let response = get_client(&endpoint).await;
+
+    let landpad: Result<_,_>;
+
+    match response
+        .expect("Error getting JSON data for get_landpads()")
+        .json::<Vec<Landpads>>()
+        .await
+    {
+        Ok(v) => landpad = Ok(v),
+        Err(e) => {
+            println!("Error getting Landpad data: {:?}", e);
+            landpad = Err(e);
+        }
+    };
+
+    return landpad;
+}
+
+// Query SpaceX_API for Landing Pads info
+pub async fn get_launches() -> Result<Vec<Launches>, actix_web::client::JsonPayloadError> {
+    let endpoint = String::from("https://api.spacexdata.com/v4/launches");
+    let response = get_client(&endpoint).await;
+
+    let launch: Result<_,_>;
+
+    match response
+        .expect("Error getting JSON data for get_lauches()")
+        .json::<Vec<Launches>>()
+        .limit(750000) //750kb limit on payload size, default max-size = 64kb
+        .await
+    {
+        Ok(v) => launch = Ok(v),
+        Err(e) => {
+            println!("Error getting Launch data: {:?}", e);
+            launch = Err(e);
+        }
+    };
+
+    return launch;
+}
+
+// Query SpaceX_API for Launch Pad info
+pub async fn get_launchpads() -> Result<Vec<LaunchPads>, actix_web::client::JsonPayloadError> {
+    let endpoint = String::from("https://api.spacexdata.com/v4/launchpads");
+    let response = get_client(&endpoint).await;
+
+    let launchpad: Result<_,_>;
+
+    match response
+        .expect("Error getting JSON data for get_launchpads()")
+        .json::<Vec<LaunchPads>>()
+        .await
+    {
+        Ok(v) => launchpad = Ok(v),
+        Err(e) => {
+            println!("Error getting Launchpad data: {:?}", e);
+            launchpad = Err(e);
+        }
+    };
+
+    return launchpad;
+}
+
+// Query SpaceX_API for Payloads info
+pub async fn get_payloads() -> Result<Vec<Payloads>, actix_web::client::JsonPayloadError> {
+    let endpoint = String::from("https://api.spacexdata.com/v4/payloads");
+    let response = get_client(&endpoint).await;
+
+    let payload: Result<_,_>;
+
+    match response
+        .expect("Error getting JSON data for get_payloads()")
+        .json::<Vec<Payloads>>()
+        .limit(750000)
+        .await
+    {
+        Ok(v) => payload = Ok(v),
+        Err(e) => {
+            println!("Error getting Payload data: {:?}", e);
+            payload = Err(e);
+        }
+    };
+
+    return payload;
+}
+
+// Query SpaceX_API for Rockets info
+pub async fn get_rockets() -> Result<Vec<Rockets>, actix_web::client::JsonPayloadError> {
+    let endpoint = String::from("https://api.spacexdata.com/v4/rockets");
+    let response = get_client(&endpoint).await;
+
+    let rocket: Result<_,_>;
+
+    match response
+        .expect("Error getting JSON data for get_rockets()")
+        .json::<Vec<Rockets>>()
+        .await
+    {
+        Ok(v) => rocket = Ok(v),
+        Err(e) => {
+            println!("Error getting Rocket data: {:?}", e);
+            rocket = Err(e);
+        }
+    };
+
+    return rocket;
 }

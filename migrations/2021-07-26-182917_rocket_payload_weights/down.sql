@@ -1,0 +1,1 @@
+DROP TABLE rocket_payload_weights

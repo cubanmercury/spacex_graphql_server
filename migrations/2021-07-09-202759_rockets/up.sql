@@ -1,0 +1,27 @@
+CREATE TABLE rockets
+(
+  rocket_id character varying NOT NULL,
+  name character varying,
+  type character varying,
+  active Boolean,
+  stages Int,
+  boosters Int,
+  cost_per_launch bigint,
+  success_rate_pct Int,
+  first_flight character varying,
+  country character varying,
+  company character varying,
+  wikipedia character varying,
+  description text,
+  height_meters Float,
+  height_feet Float,
+  diameter_meters Float,
+  diameter_feet Float,
+  mass_kg Int,
+  mass_lbs Int,
+  landing_legs_number Int,
+  landing_legs_material character varying,
+  flickr_images text[],
+  row_updated timestamp with time zone NOT NULL,
+  CONSTRAINT rockets_pkey PRIMARY KEY (rocket_id)
+)
