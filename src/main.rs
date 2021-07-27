@@ -272,6 +272,23 @@ async fn main() -> io::Result<()> {
         operations::add_rocket(&conn, &rocket);
     };
 
+    let ships = queryspacex::get_ships().await;
+    match ships {
+        Ok(info) => {
+            println!("Ships: {:?}", info);
+            for ship in info {
+                handle_push_ship_to_db(ship);
+            }
+        }
+        Err(e) => {
+            println!("Error getting ships: {:?}", e);
+        }
+    };
+    fn handle_push_ship_to_db(ship: database::models::Ships) {
+        let conn = operations::establish_connection();
+        operations::add_ship(&conn, &ship);
+    };
+
     HttpServer::new(|| {
         App::new()
             .app_data(web::PayloadConfig::new(1000000 * 250))

@@ -307,3 +307,25 @@ pub async fn get_rockets() -> Result<Vec<Rockets>, actix_web::client::JsonPayloa
 
     return rocket;
 }
+
+// Query SpaceX_API for Ships info
+pub async fn get_ships() -> Result<Vec<Ships>, actix_web::client::JsonPayloadError> {
+    let endpoint = String::from("https://api.spacexdata.com/v4/ships");
+    let response = get_client(&endpoint).await;
+
+    let ships: Result<_,_>;
+
+    match response
+        .expect("Error getting JSON data for get_ships()")
+        .json::<Vec<Ships>>()
+        .await
+    {
+        Ok(v) => ships = Ok(v),
+        Err(e) => {
+            println!("Error getting Ships data: {:?}", e);
+            ships = Err(e);
+        }
+    };
+
+    return ships;
+}

@@ -755,5 +755,45 @@ pub fn add_rocket<'a>(conn: &PgConnection, rocket_details: &'a Rockets) {
         .execute(conn)
         .expect("Error saving entry into rocket_payload_weights table");
     };
+}
 
+// Method to push row into database table['ships']
+pub fn add_ship<'a>(conn: &PgConnection, ship_details: &'a Ships) {
+  let now: DateTime<Utc> = Utc::now();
+
+  let new_ship_entry = UpdateShips {
+    id: &ship_details.id,
+    legacy_id: &ship_details.legacy_id.clone().unwrap_or("".to_string()),
+    name: &ship_details.name.clone().unwrap_or("".to_string()),
+    type_: &ship_details.r#type.clone().unwrap_or("".to_string()),
+    active: &ship_details.active.unwrap_or(false),
+    model: &ship_details.model.clone().unwrap_or("".to_string()),
+    roles: &ship_details.roles.as_ref().unwrap(),
+    imo: &ship_details.imo.unwrap_or(0),
+    mmsi: &ship_details.mmsi.unwrap_or(0),
+    abs: &ship_details.abs.unwrap_or(0),
+    class: &ship_details.class.unwrap_or(0),
+    mass_kg: &ship_details.mass_kg.unwrap_or(0),
+    mass_lbs: &ship_details.mass_lbs.unwrap_or(0),
+    year_built: &ship_details.year_built.unwrap_or(0),
+    home_port: &ship_details.home_port.clone().unwrap_or("".to_string()),
+    status: &ship_details.status.clone().unwrap_or("".to_string()),
+    speed_kn: &ship_details.speed_kn.unwrap_or(0),
+    course_deg: &ship_details.course_deg.unwrap_or(0),
+    latitude: &ship_details.latitude.unwrap_or(0.0),
+    longitude: &ship_details.longitude.unwrap_or(0.0),
+    last_ais_update: &ship_details.last_ais_update.unwrap_or(0),
+    link: &ship_details.link.clone().unwrap_or("".to_string()),
+    image: &ship_details.image.clone().unwrap_or("".to_string()),
+    launches: &ship_details.launches.as_ref().unwrap(),
+    row_updated: &now,
+  };
+
+  diesel::insert_into(ships::table)
+    .values(&new_ship_entry)
+    .on_conflict(ships::id)
+    .do_update()
+    .set(&new_ship_entry)
+    .execute(conn)
+    .expect("Error saving entry into ships table");
 }

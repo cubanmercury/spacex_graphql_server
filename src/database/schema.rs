@@ -476,6 +476,37 @@ table! {
     }
 }
 
+table! {
+    ships (id) {
+        id -> Varchar,
+        legacy_id -> Nullable<Varchar>,
+        name -> Nullable<Varchar>,
+        #[sql_name = "type"]
+        type_ -> Nullable<Varchar>,
+        active -> Nullable<Bool>,
+        model -> Nullable<Varchar>,
+        roles -> Nullable<Array<Text>>,
+        imo -> Nullable<Int8>,
+        mmsi -> Nullable<Int8>,
+        abs -> Nullable<Int8>,
+        class -> Nullable<Int8>,
+        mass_kg -> Nullable<Int8>,
+        mass_lbs -> Nullable<Int8>,
+        year_built -> Nullable<Int4>,
+        home_port -> Nullable<Varchar>,
+        status -> Nullable<Varchar>,
+        speed_kn -> Nullable<Int4>,
+        course_deg -> Nullable<Int4>,
+        latitude -> Nullable<Float8>,
+        longitude -> Nullable<Float8>,
+        last_ais_update -> Nullable<Int4>,
+        link -> Nullable<Varchar>,
+        image -> Nullable<Varchar>,
+        launches -> Nullable<Array<Text>>,
+        row_updated -> Timestamptz,
+    }
+}
+
 joinable!(payload_dragon -> payloads (payload_id));
 
 allow_tables_to_appear_in_same_query!(
@@ -504,4 +535,5 @@ allow_tables_to_appear_in_same_query!(
     rocket_payload_weights,
     rocket_second_stage,
     rockets,
+    ships,
 );
