@@ -1,5 +1,4 @@
-CREATE TABLE company_info
-(
+CREATE TABLE company_info(
   id character varying NOT NULL,
   name character varying,
   founder character varying,
@@ -12,7 +11,7 @@ CREATE TABLE company_info
   cto character varying,
   coo character varying,
   cto_propulsion character varying,
-  valuation bigint,
+  valuation Float,
   summary text,
   headquarters_address character varying,
   headquarters_city character varying,

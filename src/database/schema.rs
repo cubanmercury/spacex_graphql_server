@@ -28,7 +28,7 @@ table! {
         cto -> Nullable<Varchar>,
         coo -> Nullable<Varchar>,
         cto_propulsion -> Nullable<Varchar>,
-        valuation -> Nullable<Int8>,
+        valuation -> Nullable<Float8>,
         summary -> Nullable<Text>,
         headquarters_address -> Nullable<Varchar>,
         headquarters_city -> Nullable<Varchar>,
@@ -302,7 +302,7 @@ table! {
         capsule -> Nullable<Varchar>,
         mass_returned_kg -> Nullable<Float8>,
         mass_returned_lbs -> Nullable<Float8>,
-        flight_time_sec -> Nullable<Int8>,
+        flight_time_sec -> Nullable<Int4>,
         manifest -> Nullable<Varchar>,
         water_landing -> Nullable<Bool>,
         land_landing -> Nullable<Bool>,
@@ -456,7 +456,7 @@ table! {
         active -> Nullable<Bool>,
         stages -> Nullable<Int4>,
         boosters -> Nullable<Int4>,
-        cost_per_launch -> Nullable<Int8>,
+        cost_per_launch -> Nullable<Int4>,
         success_rate_pct -> Nullable<Int4>,
         first_flight -> Nullable<Varchar>,
         country -> Nullable<Varchar>,
@@ -486,12 +486,12 @@ table! {
         active -> Nullable<Bool>,
         model -> Nullable<Varchar>,
         roles -> Nullable<Array<Text>>,
-        imo -> Nullable<Int8>,
-        mmsi -> Nullable<Int8>,
-        abs -> Nullable<Int8>,
-        class -> Nullable<Int8>,
-        mass_kg -> Nullable<Int8>,
-        mass_lbs -> Nullable<Int8>,
+        imo -> Nullable<Int4>,
+        mmsi -> Nullable<Int4>,
+        abs -> Nullable<Int4>,
+        class -> Nullable<Int4>,
+        mass_kg -> Nullable<Int4>,
+        mass_lbs -> Nullable<Int4>,
         year_built -> Nullable<Int4>,
         home_port -> Nullable<Varchar>,
         status -> Nullable<Varchar>,
@@ -507,7 +507,69 @@ table! {
     }
 }
 
+table! {
+    starlink_spacetrack (starlink_id) {
+        starlink_id -> Varchar,
+        ccsds_omm_vers -> Nullable<Varchar>,
+        comment -> Nullable<Varchar>,
+        creation_date -> Nullable<Varchar>,
+        originator -> Nullable<Varchar>,
+        object_name -> Nullable<Varchar>,
+        object_id -> Nullable<Varchar>,
+        center_name -> Nullable<Varchar>,
+        ref_frame -> Nullable<Varchar>,
+        time_system -> Nullable<Varchar>,
+        mean_element_theory -> Nullable<Varchar>,
+        epoch -> Nullable<Varchar>,
+        mean_motion -> Nullable<Float8>,
+        eccentricity -> Nullable<Float8>,
+        inclination -> Nullable<Float8>,
+        ra_of_asc_node -> Nullable<Float8>,
+        arg_of_pericenter -> Nullable<Float8>,
+        mean_anomaly -> Nullable<Float8>,
+        ephemeris_type -> Nullable<Float8>,
+        classification_type -> Nullable<Varchar>,
+        norad_cat_id -> Nullable<Int4>,
+        element_set_no -> Nullable<Int4>,
+        rev_at_epoch -> Nullable<Int4>,
+        bstar -> Nullable<Float8>,
+        mean_motion_dot -> Nullable<Float8>,
+        mean_motion_ddot -> Nullable<Float8>,
+        semimajor_axis -> Nullable<Float8>,
+        period -> Nullable<Float8>,
+        apoapsis -> Nullable<Float8>,
+        periapsis -> Nullable<Float8>,
+        object_type -> Nullable<Varchar>,
+        rcs_size -> Nullable<Varchar>,
+        country_code -> Nullable<Varchar>,
+        launch_date -> Nullable<Varchar>,
+        site -> Nullable<Varchar>,
+        decay_date -> Nullable<Varchar>,
+        decayed -> Nullable<Int4>,
+        file -> Nullable<Int4>,
+        gp_id -> Nullable<Int4>,
+        tle_line0 -> Nullable<Varchar>,
+        tle_line1 -> Nullable<Varchar>,
+        tle_line2 -> Nullable<Varchar>,
+        row_updated -> Timestamptz,
+    }
+}
+
+table! {
+    starlinks (starlink_id) {
+        starlink_id -> Varchar,
+        version -> Nullable<Varchar>,
+        launch -> Nullable<Varchar>,
+        longitude -> Nullable<Float8>,
+        latitude -> Nullable<Float8>,
+        height_km -> Nullable<Float8>,
+        velocity_kms -> Nullable<Float8>,
+        row_updated -> Timestamptz,
+    }
+}
+
 joinable!(payload_dragon -> payloads (payload_id));
+joinable!(starlink_spacetrack -> starlinks (starlink_id));
 
 allow_tables_to_appear_in_same_query!(
     capsules,
@@ -536,4 +598,6 @@ allow_tables_to_appear_in_same_query!(
     rocket_second_stage,
     rockets,
     ships,
+    starlink_spacetrack,
+    starlinks,
 );

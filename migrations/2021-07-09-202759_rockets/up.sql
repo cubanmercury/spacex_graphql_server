@@ -6,7 +6,7 @@ CREATE TABLE rockets
   active Boolean,
   stages Int,
   boosters Int,
-  cost_per_launch bigint,
+  cost_per_launch Int,
   success_rate_pct Int,
   first_flight character varying,
   country character varying,

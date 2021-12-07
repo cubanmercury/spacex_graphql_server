@@ -22,5 +22,6 @@ actix-session = "0.4"
 actix-utils = "2"
 actix = "0.11.1"
 awc = {version = "2.0.3", features=["rustls"]}
-diesel = { version = "1.4.6", features = ["postgres", "chrono", "numeric"]}
+diesel = { version = "1.4.6", features = ["postgres", "chrono", "numeric","64-column-tables"]}
 chrono = "0.4"
+async-trait = "0.1.51"

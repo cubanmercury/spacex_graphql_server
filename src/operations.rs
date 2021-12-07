@@ -3,9 +3,22 @@ use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use dotenv::dotenv;
 use std::env;
+// use std::convert::TryFrom;
 
 use crate::database::models::*;
 use crate::database::schema::*;
+
+// struct BigIntegerValue(i64);
+// impl TryFrom<i64> for BigIntegerValue {
+//   type Error = &'static str;
+//   fn try_from(value: i64) -> Result<Self, Self::Error> {
+//     if value >= 1000000 {
+
+//     } else {
+//       Ok()
+//     }
+//   }
+// } 
 
 // Database connection PgConnection
 pub fn establish_connection() -> PgConnection {
@@ -90,7 +103,7 @@ pub fn create_company<'a>(conn: &PgConnection, company_details: &'a Company) {
     cto: &company_details.cto.as_ref().unwrap(),
     coo: &company_details.coo.as_ref().unwrap(),
     cto_propulsion: &company_details.cto_propulsion.as_ref().unwrap(),
-    valuation: &company_details.valuation.unwrap(),
+    valuation: &(company_details.valuation.unwrap() as f64),
     summary: &company_details.summary.as_ref().unwrap(),
     headquarters_address: &company_details.headquarters.address.as_ref().unwrap(),
     headquarters_city: &company_details.headquarters.city.as_ref().unwrap(),
@@ -796,4 +809,84 @@ pub fn add_ship<'a>(conn: &PgConnection, ship_details: &'a Ships) {
     .set(&new_ship_entry)
     .execute(conn)
     .expect("Error saving entry into ships table");
+}
+
+// Method to push row into database table['starlinks', 'starlink_spacetrack']
+pub fn add_starlink<'a>(conn: &PgConnection, starlink_details: &'a Starlinks) {
+  let now: DateTime<Utc> = Utc::now();
+
+  let new_starlink_entry = UpdateStarlinks {
+    starlink_id: &starlink_details.id,
+    version: &starlink_details.version.clone().unwrap_or("".to_string()),
+    launch: &starlink_details.launch.clone().unwrap_or("".to_string()),
+    longitude: &starlink_details.longitude.unwrap_or(0.0),
+    latitude: &starlink_details.latitude.unwrap_or(0.0),
+    height_km: &starlink_details.height_km.unwrap_or(0.0),
+    velocity_kms: &starlink_details.velocity_kms.unwrap_or(0.0),
+    row_updated: &now,
+  };
+
+  let new_starlink_spacetrack_entry = UpdateStarlinkSpacetrack {
+    starlink_id: &starlink_details.id,
+    ccsds_omm_vers: &starlink_details.spaceTrack.CCSDS_OMM_VERS.clone().unwrap_or("".to_string()),
+    comment: &starlink_details.spaceTrack.COMMENT.clone().unwrap_or("".to_string()),
+    creation_date: &starlink_details.spaceTrack.CREATION_DATE.clone().unwrap_or("".to_string()),
+    originator: &starlink_details.spaceTrack.ORIGINATOR.clone().unwrap_or("".to_string()),
+    object_name: &starlink_details.spaceTrack.OBJECT_NAME.clone().unwrap_or("".to_string()),
+    object_id: &starlink_details.spaceTrack.OBJECT_ID.clone().unwrap_or("".to_string()),
+    center_name: &starlink_details.spaceTrack.CENTER_NAME.clone().unwrap_or("".to_string()),
+    ref_frame: &starlink_details.spaceTrack.REF_FRAME.clone().unwrap_or("".to_string()),
+    time_system: &starlink_details.spaceTrack.TIME_SYSTEM.clone().unwrap_or("".to_string()),
+    mean_element_theory: &starlink_details.spaceTrack.MEAN_ELEMENT_THEORY.clone().unwrap_or("".to_string()),
+    epoch: &starlink_details.spaceTrack.EPOCH.clone().unwrap_or("".to_string()),
+    mean_motion: &starlink_details.spaceTrack.MEAN_MOTION.unwrap_or(0.0),
+    eccentricity: &starlink_details.spaceTrack.ECCENTRICITY.unwrap_or(0.0),
+    inclination: &starlink_details.spaceTrack.INCLINATION.unwrap_or(0.0),
+    ra_of_asc_node: &starlink_details.spaceTrack.RA_OF_ASC_NODE.unwrap_or(0.0),
+    arg_of_pericenter: &starlink_details.spaceTrack.ARG_OF_PERICENTER.unwrap_or(0.0),
+    mean_anomaly: &starlink_details.spaceTrack.MEAN_ANOMALY.unwrap_or(0.0),
+    ephemeris_type: &starlink_details.spaceTrack.EPHEMERIS_TYPE.unwrap_or(0.0),
+    classification_type: &starlink_details.spaceTrack.CLASSIFICATION_TYPE.clone().unwrap_or("".to_string()),
+    norad_cat_id: &starlink_details.spaceTrack.NORAD_CAT_ID.unwrap_or(0),
+    element_set_no: &starlink_details.spaceTrack.ELEMENT_SET_NO.unwrap_or(0),
+    rev_at_epoch: &starlink_details.spaceTrack.REV_AT_EPOCH.unwrap_or(0),
+    bstar: &starlink_details.spaceTrack.BSTAR.unwrap_or(0.0),
+    mean_motion_dot: &starlink_details.spaceTrack.MEAN_MOTION_DOT.unwrap_or(0.0),
+    mean_motion_ddot: &starlink_details.spaceTrack.MEAN_MOTION_DDOT.unwrap_or(0.0),
+    semimajor_axis: &starlink_details.spaceTrack.SEMIMAJOR_AXIS.unwrap_or(0.0),
+    period: &starlink_details.spaceTrack.PERIOD.unwrap_or(0.0),
+    apoapsis: &starlink_details.spaceTrack.APOAPSIS.unwrap_or(0.0),
+    periapsis: &starlink_details.spaceTrack.PERIAPSIS.unwrap_or(0.0),
+    object_type: &starlink_details.spaceTrack.OBJECT_TYPE.clone().unwrap_or("".to_string()),
+    rcs_size: &starlink_details.spaceTrack.RCS_SIZE.clone().unwrap_or("".to_string()),
+    country_code: &starlink_details.spaceTrack.COUNTRY_CODE.clone().unwrap_or("".to_string()),
+    launch_date: &starlink_details.spaceTrack.LAUNCH_DATE.clone().unwrap_or("".to_string()),
+    site: &starlink_details.spaceTrack.SITE.clone().unwrap_or("".to_string()),
+    decay_date: &starlink_details.spaceTrack.DECAY_DATE.clone().unwrap_or("".to_string()),
+    decayed: &starlink_details.spaceTrack.DECAYED.unwrap_or(0),
+    file: &starlink_details.spaceTrack.FILE.unwrap_or(0),
+    gp_id: &starlink_details.spaceTrack.GP_ID.unwrap_or(0),
+    tle_line0: &starlink_details.spaceTrack.TLE_LINE0.clone().unwrap_or("".to_string()),
+    tle_line1: &starlink_details.spaceTrack.TLE_LINE1.clone().unwrap_or("".to_string()),
+    tle_line2: &starlink_details.spaceTrack.TLE_LINE2.clone().unwrap_or("".to_string()),
+    row_updated: &now,
+  };
+
+  diesel::insert_into(starlinks::table)
+    .values(&new_starlink_entry)
+    .on_conflict(starlinks::starlink_id)
+    .do_update()
+    .set(&new_starlink_entry)
+    .execute(conn)
+    .expect("Error saving entry into starlinks table");
+
+
+
+  diesel::insert_into(starlink_spacetrack::table)
+    .values(&new_starlink_spacetrack_entry)
+    .on_conflict(starlink_spacetrack::starlink_id)
+    .do_update()
+    .set(&new_starlink_spacetrack_entry)
+    .execute(conn)
+    .expect("Error saving entry into starlink_spacetrack table");
 }

@@ -4,9 +4,10 @@ use awc::error::SendRequestError;
 use awc::Client;
 use awc::ClientResponse;
 // use serde_derive::Deserialize;
+// use async_trait::async_trait;
 
-use crate::database::models::Company;
-use crate::database::models::Roadster;
+// use crate::database::models::Company;
+// use crate::database::models::Roadster;
 use crate::database::models::*;
 
 pub async fn get_client(
@@ -329,3 +330,56 @@ pub async fn get_ships() -> Result<Vec<Ships>, actix_web::client::JsonPayloadErr
 
     return ships;
 }
+
+// Query SpaceX_API for Starlnk satellites info
+pub async fn get_starlinks() -> Result<Vec<Starlinks>, actix_web::client::JsonPayloadError> {
+    let endpoint = String::from("https://api.spacexdata.com/v4/starlink");
+    let response = get_client(&endpoint).await;
+
+    let starlinks: Result<_, _>;
+
+    match response
+        .expect("Error getting JSON dat for get_starlinks()")
+        .json::<Vec<Starlinks>>()
+        .limit(240000000)
+        .await
+    {
+        Ok(v) => starlinks = Ok(v),
+        Err(e) => {
+            println!("Error getting Starlink data: {:?}", e);
+            starlinks = Err(e);
+        }
+    };
+
+    return starlinks;
+}
+
+// #[async_trait]
+// trait GetFromSpaceX {
+//     async fn get_data(&self) -> Result<Vec<Self>, actix_web::client::JsonPayloadError>;
+// }
+
+// #[async_trait]
+// impl GetFromSpaceX for Starlinks {
+//     async fn get_data(&self) -> Result<Vec<Self>, actix_web::client::JsonPayloadError> {
+//         let endpoint = String::from("https://api.spacexdata.com/v4/starlink");
+//         let response = get_client(&endpoint).await;
+    
+//         let starlinks: Result<_, _>;
+    
+//         match response
+//             .expect("Error getting JSON dat for get_starlinks()")
+//             .json::<Vec<Self>>()
+//             .limit(2400000)
+//             .await
+//         {
+//             Ok(v) => starlinks = Ok(v),
+//             Err(e) => {
+//                 println!("Error getting Starlink data: {:?}", e);
+//                 starlinks = Err(e);
+//             }
+//         };
+    
+//         return starlinks; 
+//     }
+// }

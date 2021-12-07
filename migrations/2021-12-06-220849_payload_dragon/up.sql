@@ -5,7 +5,7 @@ CREATE TABLE payload_dragon
   capsule character varying,
   mass_returned_kg Float,
   mass_returned_lbs Float,
-  flight_time_sec bigint,
+  flight_time_sec Int,
   manifest character varying,
   water_landing Boolean,
   land_landing Boolean,
@@ -15,4 +15,4 @@ CREATE TABLE payload_dragon
     FOREIGN KEY(payload_id)
       REFERENCES payloads(payload_id),
   UNIQUE(payload_id)
-)
+)-- Your SQL goes here
