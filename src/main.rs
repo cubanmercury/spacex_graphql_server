@@ -2,7 +2,7 @@
 extern crate diesel;
 extern crate dotenv;
 extern crate juniper;
-
+extern crate tokio;
 
 use actix_files as fs;
 use actix_session::{CookieSession, Session};
@@ -11,9 +11,13 @@ use actix_web::http::{header, Method, StatusCode};
 use actix_web::{
     error, get, guard, middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer, Result,
 };
+use juniper::{EmptyMutation, EmptySubscription};
+use juniper_actix::{graphiql_handler, graphql_handler, playground_handler};
+
 use std::{env, io};
 
 pub mod database;
+pub mod gql;
 pub mod operations;
 pub mod queryspacex;
 
@@ -68,7 +72,6 @@ async fn main() -> io::Result<()> {
     env_logger::init();
 
     let roadster = queryspacex::get_roadster_info().await;
-
     match roadster {
         Ok(info) => {
             // println!("roadster within main.rs, {:?}", info);
@@ -76,7 +79,6 @@ async fn main() -> io::Result<()> {
         }
         Err(e) => println!("roadster error within main.rs, {:?}", e),
     };
-
     fn handle_push_roadster_to_db(info: database::models::Roadster) {
         let conn = operations::establish_connection();
         operations::delete_roadster_by_id(&conn, &info);
@@ -92,7 +94,6 @@ async fn main() -> io::Result<()> {
         }
         Err(e) => println!("Error getting Company JSON data: {:?}", e),
     };
-
     fn handle_push_company_to_db(info: database::models::Company) {
         let conn = operations::establish_connection();
         operations::delete_company_by_id(&conn, &info);
@@ -112,7 +113,6 @@ async fn main() -> io::Result<()> {
             println!("ERROR GETTING CAPSULES: {:?}", e)
         }
     };
-
     fn handle_push_capsules_to_db(info: database::models::Capsules) {
         let conn = operations::establish_connection();
         operations::add_capsule(&conn, &info);
@@ -315,6 +315,28 @@ async fn main() -> io::Result<()> {
         println!("Starlinks table updated in database successfully");
     }
 
+    fn schema() -> gql::resolver::Schema {
+        gql::resolver::Schema::new(
+            gql::resolver::QueryRoot,
+            EmptyMutation::<Database>::new(),
+            EmptySubscription::<Database>::new(),
+        )
+    }
+    async fn graphiql_route() -> Result<HttpResponse, Error> {
+        graphiql_handler("/graphql", None).await
+    }
+    async fn playground_route() -> Result<HttpResponse, Error> {
+        playground_handler("/graphql", None).await
+    }
+    async fn graphql_route(
+        req: actix_web::HttpRequest,
+        payload: actix_web::web::Payload,
+        schema: web::Data<gql::resolver::Schema>,
+    ) -> Result<HttpResponse, Error> {
+        let context = gql::resolver::Database::new();
+        graphql_handler(&schema, &context, req, payload).await
+    }
+
     HttpServer::new(|| {
         App::new()
             .app_data(web::PayloadConfig::new(1000000 * 250))
@@ -335,6 +357,13 @@ async fn main() -> io::Result<()> {
                     _ => HttpResponse::NotFound(),
                 }),
             )
+            .service(
+                web::resource("/graphql")
+                    .route(web::post().to(graphql_route))
+                    .route(web::get().to(graphql_route)),
+            )
+            .service(web::resource("/playground").route(web::get().to(playground_route)))
+            .service(web::resource("/graphiql").route(web::get().to(graphiql_route)))
             .service(web::resource("/error").to(|| async {
                 error::InternalError::new(
                     io::Error::new(io::ErrorKind::Other, "test"),

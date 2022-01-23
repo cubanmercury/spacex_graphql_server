@@ -1,6 +1,6 @@
 use serde_derive::Deserialize;
 use chrono::{DateTime, Utc};
-use juniper::{FieldResult, GraphQLObject};
+use juniper::{GraphQLObject};
 
 use super::schema::*;
 
@@ -82,7 +82,7 @@ pub struct CompanyLinks {
   pub twitter: Option<String>,
   pub elon_twitter: Option<String>,
 }
-#[derive(Debug, GraphQLObject)]
+#[derive(Debug, GraphQLObject, Queryable)]
 pub struct CompanyGraphQL {
   pub id: String,
   pub name: Option<String>,
@@ -120,7 +120,8 @@ pub struct Company {
   pub headquarters: CompanyHeadquarters,
   pub links: CompanyLinks,
 }
-#[derive(Insertable, AsChangeset)]
+#[derive(Insertable, AsChangeset, Queryable)]
+// #[graphql(description = "Insert/Update Company rows in database")]
 #[table_name="company_info"]
 pub struct UpdateCompany<'a> {
   pub id: &'a str,
@@ -146,7 +147,103 @@ pub struct UpdateCompany<'a> {
   pub links_elon_twitter: &'a String,
   pub row_updated: &'a DateTime<Utc>,
 }
+#[derive(Insertable, AsChangeset, Deserialize, Queryable, GraphQLObject)]
+// #[graphql(description = "Insert/Update Company rows in database")]
+#[table_name="company_info"]
+pub struct UpdateCompanyGraphQL {
+  pub id: String,
+  pub name: Option<String>,
+  pub founder: Option<String>,
+  pub founded: Option<i32>,
+  pub employees: Option<i32>,
+  pub vehicles: Option<i32>,
+  pub launch_sites: Option<i32>,
+  pub test_sites: Option<i32>,
+  pub ceo: Option<String>,
+  pub cto: Option<String>,
+  pub coo: Option<String>,
+  pub cto_propulsion: Option<String>,
+  pub valuation: Option<f64>,
+  pub summary: Option<String>,
+  pub headquarters_address: Option<String>,
+  pub headquarters_city: Option<String>,
+  pub headquarters_state: Option<String>,
+  pub links_website: Option<String>,
+  pub links_flickr: Option<String>,
+  pub links_twitter: Option<String>,
+  pub links_elon_twitter: Option<String>,
+  pub row_updated: DateTime<Utc>,
+}
+// #[juniper::graphql_object]
+// impl UpdateCompanyGraphQL {
+//   fn id(&self) -> &str {
+//     &self.id
+//   }
+//   fn name(&self) -> &Option<String> {
+//     &self.name
+//   }
+//   fn founder(&self) -> &Option<String> {
+//     &self.founder
+//   }
+//   fn founded(&self) -> &Option<i32> {
+//     &self.founded
+//   }
+//   fn employees(&self) -> &Option<i32> {
+//     &self.employees
+//   }
+//   fn vehicles(&self) -> &Option<i32> {
+//     &self.vehicles
+//   }
+//   fn launch_sites(&self) -> &Option<i32> {
+//     &self.launch_sites
+//   }
+//   fn test_sites(&self) -> &Option<i32> {
+//     &self.test_sites
+//   }
+//   fn ceo(&self) -> &Option<String> {
+//     &self.ceo
+//   }
+//   fn cto(&self) -> &Option<String> {
+//     &self.cto
+//   }
+//   fn coo(&self) -> &Option<String> {
+//     &self.coo
+//   }
+//   fn cto_propulsion(&self) -> &Option<String> {
+//     &self.cto_propulsion
+//   }
+//   fn valuation(&self) -> &Option<f64> {
+//     &self.valuation
+//   }
+//   fn summary(&self) -> &Option<String> {
+//     &self.summary
+//   }
+//   fn headquarters_address(&self) -> &Option<String> {
+//     &self.headquarters_address
+//   }
+//   fn headquarters_city(&self) -> &Option<String> {
+//     &self.headquarters_city
+//   }
+//   fn headquarters_state(&self) -> &Option<String> {
+//     &self.headquarters_state
+//   }
+//   fn links_website(&self) -> &Option<String> {
+//     &self.links_website
+//   }
+//   fn links_flickr(&self) -> &Option<String> {
+//     &self.links_flickr
+//   }
+//   fn links_twitter(&self) -> &Option<String> {
+//     &self.links_twitter
+//   }
+//   fn links_elon_twitter(&self) -> &Option<String> {
+//     &self.links_elon_twitter
+//   }
+//   fn row_updated(&self) -> &DateTime<Utc> {
+//     &self.row_updated
+//   }
 
+// }
 
 #[derive(Debug, Deserialize, Queryable, GraphQLObject)]
 pub struct Capsules {

@@ -6,8 +6,6 @@ use awc::ClientResponse;
 // use serde_derive::Deserialize;
 // use async_trait::async_trait;
 
-// use crate::database::models::Company;
-// use crate::database::models::Roadster;
 use crate::database::models::*;
 
 pub async fn get_client(
